@@ -1,0 +1,32 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="128" fill="url(#paint0_linear)"/>
+  
+  <!-- Truck Body -->
+  <path d="M120 200C120 188.954 128.954 180 140 180H340C351.046 180 360 188.954 360 200V300H120V200Z" fill="white" fill-opacity="0.1"/>
+  <rect x="140" y="200" width="180" height="120" rx="12" fill="white"/>
+  <path d="M320 240H380C391.046 240 400 248.954 400 260V320H320V240Z" fill="white"/>
+  
+  <!-- Window -->
+  <path d="M330 250H370C375.523 250 380 254.477 380 260V290H330V250Z" fill="#1a1a2e"/>
+  
+  <!-- Wheels -->
+  <circle cx="180" cy="340" r="25" fill="#1a1a2e"/>
+  <circle cx="180" cy="340" r="10" fill="white" fill-opacity="0.3"/>
+  
+  <circle cx="280" cy="340" r="25" fill="#1a1a2e"/>
+  <circle cx="280" cy="340" r="10" fill="white" fill-opacity="0.3"/>
+  
+  <circle cx="370" cy="340" r="25" fill="#1a1a2e"/>
+  <circle cx="370" cy="340" r="10" fill="white" fill-opacity="0.3"/>
+  
+  <!-- Detail lines -->
+  <rect x="155" y="215" width="150" height="3" rx="1.5" fill="#1a1a2e" fill-opacity="0.1"/>
+  <rect x="155" y="225" width="150" height="3" rx="1.5" fill="#1a1a2e" fill-opacity="0.1"/>
+
+  <defs>
+    <linearGradient id="paint0_linear" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#4F46E5"/>
+    </linearGradient>
+  </defs>
+</svg>

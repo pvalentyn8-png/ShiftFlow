@@ -1,0 +1,17 @@
+{
+  "name": "Shift Tracker",
+  "short_name": "ShiftTracker",
+  "description": "App for tracking shifts and advances.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
