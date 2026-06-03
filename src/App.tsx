@@ -23,15 +23,297 @@ import {
   Info,
   RefreshCw
 } from "lucide-react";
-import { APP_VERSION, T } from "./i18n";
-import { THEMES, type ThemeName } from "./themes";
 
 const HOURS_IN_DAY = 24;
-const STORAGE_KEY = "shift_tracker_data_v3";
-const LANGUAGE_KEY = "shift_tracker_preferred_lang";
-const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
-const getFirstDayOfMonth = (year: number, month: number) => (new Date(year, month, 1).getDay() + 6) % 7;
-const formatHour = (h: number) => `${String(h).padStart(2, "0")}:00`;
+const APP_VERSION = "3.4";
+
+const T = {
+  ua: {
+    appTitle: "Трекер Змін",
+    version: "Версія",
+    onboardingTitle: "Оновлення v3.4! 🔋",
+    onboarding1: "Економія заряду: Авто-оновлення тепер лише о 3:00 ночі.",
+    onboarding2: "Свайп вниз: Тягніть екран вниз для ручної перевірки оновлень.",
+    onboarding3: "Пам'ять Профілів: Кожен водій має незалежний календар.",
+    onboarding4: "Синхронізація: Дані миттєво оновлюються між вкладками.",
+    onboarding5: "PWA: Встановіть як додаток для швидкого доступу.",
+    gotIt: "Зрозумів",
+    perShift: "зміна",
+    perHour: "год",
+    history: "Історія",
+    historyLog: "Лог місяців",
+    noHistory: "Історія порожня",
+    months: ["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"],
+    monthsShort: ["Січ","Лют","Бер","Кві","Тра","Чер","Лип","Сер","Вер","Жов","Лис","Гру"],
+    days: ["Пн","Вт","Ср","Чт","Пт","Сб","Нд"],
+    driverPlaceholder: "Ім'я водія...",
+    shifts: "Змін",
+    hours: "Годин",
+    earned: "Зароблено",
+    advances: "Аванси",
+    advancesTitle: "Аванси за",
+    addAdvance: "Додати аванс",
+    advanceAmount: "Сума авансу (zł)",
+    advanceNote: "Примітка (необов'язково)",
+    save: "Зберегти",
+    cancel: "Скасувати",
+    delete: "Видалити",
+    summary: "Підсумок за",
+    shiftList: "Список змін",
+    advanceList: "Список авансів",
+    progress: "з ~30 можливих змін",
+    hint: "👆 натисни — добу · утримуй — обрати години",
+    shiftModal: "Налаштування зміни",
+    start: "Початок",
+    end: "Кінець",
+    hoursEarned: "годин → заробіток",
+    saveShift: "Зберегти",
+    manualAmountLabel: "Сума вручну (опц.)",
+    timeError: "⚠ Час кінця має бути пізніше початку",
+    hourlyRateLabel: "zł / год",
+    shiftDurationLabel: "год / зміна",
+    dailyRateLabel: "zł / зміна",
+    balance: "Нараховано",
+    totalEarned: "Сума за період",
+    totalAdvances: "Аванси",
+    toReceive: "До отримання",
+    noAdvances: "Авансів немає",
+    enterAmount: "Введіть суму",
+    theme: "Тема",
+    start24: "Виїзд піс. 24",
+    start45: "Виїзд піс. 45",
+    restTitle: "Тижневий цикл (6 днів)",
+    restSince: "Початок роботи:",
+    restUntil: "Наст. пауза до:",
+    restRemaining: "Залишилось часу",
+    restDone: "Цикл вичерпано! 🛑",
+    restClean: "Скинути",
+    selectStart: "Оберіть дату та час виїзду",
+    activeRest: "Робочий тиждень",
+    after24Notice: "⚠️ Скорочений відпочинок. Наступний має бути 45г + компенсація!",
+    after45Notice: "✅ Регулярний відпочинок. Початок нового циклу.",
+    compensation: "Компенсація",
+    compHours: "год необхідно додати",
+    compWarning: "Потрібно повернути 21г до кінця 3-го тижня!",
+    menu24: "Меню 24ч",
+    menu45: "Меню 45ч",
+    clearData: "Очистити дані",
+    confirmReset: "Видалити все?",
+    resetWarning: "Це видалить всю історію змін, авансів та налаштування. Цю дію неможливо скасувати.",
+    confirmAdvance: "Підтвердити аванс?",
+    hoursDoneLabel: "Скільки годин паузи вже зроблено?",
+    yesAdd: "OK",
+    manageProfiles: "Профілі",
+    addProfile: "Додати профіль",
+    profileName: "Ім'я водія",
+    dailyRate: "Ставка (zł)",
+    deleteProfile: "Видалити",
+    selectProfile: "Вибрати",
+    noProfiles: "Немає профілів",
+    newUpdate: "Доступне оновлення! 📥",
+    updating: "Оновлюємо програму...",
+  },
+  pl: {
+    appTitle: "Tracker Zmian",
+    version: "Wersja",
+    onboardingTitle: "Aktualizacja v3.4! 🔋",
+    onboarding1: "Oszczędzanie energii: Auto-aktualizacja tylko o 3:00 rano.",
+    onboarding2: "Swipe w dół: Przeciągnij ekran w dół, aby sprawdzić aktualizacje.",
+    onboarding3: "Pamięć Profili: Każdy kierowca ma niezależną historię.",
+    onboarding4: "Synchronizacja: Dane są aktualizowane między kartami.",
+    onboarding5: "PWA: Zainstaluj jako aplikację dla lepszej wydajności.",
+    gotIt: "Rozumiem",
+    perShift: "zmiana",
+    perHour: "godz",
+    history: "Historia",
+    historyLog: "Log miesięcy",
+    noHistory: "Historia jest pusta",
+    months: ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"],
+    monthsShort: ["Sty","Lut","Mar","Kwi","Maj","Cze","Lip","Sie","Wrz","Paź","Lis","Gru"],
+    days: ["Pon","Wt","Śr","Czw","Pt","Sob","Nd"],
+    driverPlaceholder: "Imię kierowcy...",
+    shifts: "Zmian",
+    hours: "Godzin",
+    earned: "Zarobiono",
+    advances: "Zaliczki",
+    advancesTitle: "Zaliczki za",
+    addAdvance: "Dodaj zaliczkę",
+    advanceAmount: "Kwota zaliczki (zł)",
+    advanceNote: "Notatka (opcjonalnie)",
+    save: "Zapisz",
+    cancel: "Anuluj",
+    delete: "Usuń",
+    summary: "Podsumowanie za",
+    shiftList: "Lista zmian",
+    advanceList: "Lista zaliczek",
+    progress: "z ~30 możliwych zmian",
+    hint: "👆 dotknij — cała doba · przytrzymaj — wybierz godziny",
+    shiftModal: "Ustawienia zmiany",
+    start: "Początek",
+    end: "Koniec",
+    hoursEarned: "godz → zarobek",
+    saveShift: "Zapisz",
+    manualAmountLabel: "Kwota ręcznie (opcj.)",
+    timeError: "⚠ Koniec musi być późniejszy niż początek",
+    hourlyRateLabel: "zł / godz",
+    shiftDurationLabel: "godz / zmiana",
+    dailyRateLabel: "zł / zmiana",
+    balance: "Do wypłaty",
+    totalEarned: "Naliczono",
+    totalAdvances: "Zaliczki",
+    toReceive: "Suma netto",
+    noAdvances: "Brak zaliczek",
+    enterAmount: "Podaj kwotę",
+    theme: "Motyw",
+    start24: "Wyjazd po 24",
+    start45: "Wyjazd po 45",
+    restTitle: "Cykl tygodniowy (6 dni)",
+    restSince: "Początek pracy:",
+    restUntil: "Nast. pauza do:",
+    restRemaining: "Pozostało czasu",
+    restDone: "Czas cyklu minął! 🛑",
+    restClean: "Resetuj",
+    selectStart: "Wybierz datę i godzinę wyjazdu",
+    activeRest: "Tydzień pracy",
+    after24Notice: "⚠️ Odpoczynek skrócony. Następny musi być 45h + rekompensata!",
+    after45Notice: "✅ Odpoczynek regularny. Początek nowego cyklu.",
+    compensation: "Rekompensata",
+    compHours: "godz należy dodać",
+    compWarning: "Pamiętaj o oddaniu 21h do końca 3. tygodnia!",
+    menu24: "Menu 24h",
+    menu45: "Menu 45h",
+    clearData: "Wyczyść dane",
+    confirmReset: "Usunąć wszystko?",
+    resetWarning: "To usunie całą historię zmian, zaliczek i ustawienia. Tej operacji nie można cofnąć.",
+    confirmAdvance: "Potwierdzić zaliczkę?",
+    hoursDoneLabel: "Ile godzin pauzy już zrobiono?",
+    yesAdd: "OK",
+    manageProfiles: "Profile",
+    addProfile: "Dodaj profil",
+    profileName: "Imię kierowcy",
+    dailyRate: "Stawka (zł)",
+    deleteProfile: "Usuń",
+    selectProfile: "Wybierz",
+    noProfiles: "Brak profilów",
+    newUpdate: "Dostępna aktualizacja! 📥",
+    updating: "Aktualizowanie aplikacji...",
+  }
+};
+
+type ThemeName = "deep-night" | "midnight" | "forest" | "sunset" | "light";
+
+interface ThemeColors {
+  bg: string;
+  card: string;
+  text: string;
+  textMuted: string;
+  accent: string;
+  accentMuted: string;
+  accentText: string;
+  border: string;
+  glow: string;
+  secondary: string;
+  secondaryBg: string;
+  secondaryBorder: string;
+  indicator: string;
+  btnIcon: string;
+}
+
+const THEMES: Record<ThemeName, ThemeColors> = {
+  "deep-night": {
+    bg: "bg-[#0a0a1a]",
+    card: "bg-white/[0.03]",
+    text: "text-[#e8e0f0]",
+    textMuted: "text-purple-400/60",
+    accent: "purple-600",
+    accentMuted: "bg-purple-500/10",
+    accentText: "text-purple-400",
+    border: "border-white/10",
+    glow: "shadow-purple-900/40",
+    secondary: "amber-500",
+    secondaryBg: "bg-amber-500/10",
+    secondaryBorder: "border-amber-500/30",
+    indicator: "bg-purple-500",
+    btnIcon: "text-purple-400",
+  },
+  "midnight": {
+    bg: "bg-[#020617]",
+    card: "bg-sky-950/20",
+    text: "text-sky-50",
+    textMuted: "text-sky-400/60",
+    accent: "sky-600",
+    accentMuted: "bg-sky-500/10",
+    accentText: "text-sky-400",
+    border: "border-sky-500/20",
+    glow: "shadow-sky-900/40",
+    secondary: "emerald-500",
+    secondaryBg: "bg-emerald-500/10",
+    secondaryBorder: "border-emerald-500/30",
+    indicator: "bg-sky-500",
+    btnIcon: "text-sky-400",
+  },
+  "forest": {
+    bg: "bg-[#051109]",
+    card: "bg-emerald-950/20",
+    text: "text-emerald-50",
+    textMuted: "text-emerald-400/60",
+    accent: "emerald-600",
+    accentMuted: "bg-emerald-500/10",
+    accentText: "text-emerald-400",
+    border: "border-emerald-500/20",
+    glow: "shadow-emerald-900/40",
+    secondary: "lime-500",
+    secondaryBg: "bg-lime-500/10",
+    secondaryBorder: "border-lime-500/30",
+    indicator: "bg-emerald-500",
+    btnIcon: "text-emerald-400",
+  },
+  "sunset": {
+    bg: "bg-[#1a0c0c]",
+    card: "bg-orange-950/20",
+    text: "text-orange-50",
+    textMuted: "text-orange-400/60",
+    accent: "orange-600",
+    accentMuted: "bg-orange-500/10",
+    accentText: "text-orange-400",
+    border: "border-orange-500/20",
+    glow: "shadow-orange-900/40",
+    secondary: "rose-500",
+    secondaryBg: "bg-rose-500/10",
+    secondaryBorder: "border-rose-500/30",
+    indicator: "bg-orange-500",
+    btnIcon: "text-orange-400",
+  },
+  "light": {
+    bg: "bg-[#f8fafc]",
+    card: "bg-white",
+    text: "text-slate-900",
+    textMuted: "text-slate-400",
+    accent: "purple-600",
+    accentMuted: "bg-purple-100",
+    accentText: "text-purple-600",
+    border: "border-slate-200",
+    glow: "shadow-purple-200/50",
+    secondary: "amber-600",
+    secondaryBg: "bg-amber-100",
+    secondaryBorder: "border-amber-300",
+    indicator: "bg-purple-600",
+    btnIcon: "text-purple-600",
+  }
+};
+
+function getDaysInMonth(year: number, month: number) {
+  return new Date(year, month + 1, 0).getDate();
+}
+
+function getFirstDayOfMonth(year: number, month: number) {
+  let d = new Date(year, month, 1).getDay();
+  return d === 0 ? 6 : d - 1;
+}
+
+function formatHour(h: number) {
+  return String(h).padStart(2, "0") + ":00";
+}
 
 interface Shift {
   start: number;
@@ -70,12 +352,12 @@ export default function ShiftTracker() {
   // State
   const [lang, setLang] = useState<"ua" | "pl">(() => {
     // Try to get language from dedicated key first, then from old storage, then default
-    const dedicated = localStorage.getItem(LANGUAGE_KEY);
+    const dedicated = localStorage.getItem("shift_tracker_preferred_lang");
     if (dedicated === "ua" || dedicated === "pl") return dedicated;
     
     // Fallback to main storage if exists
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem("shift_tracker_data_v3");
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.lang === "ua" || parsed.lang === "pl") return parsed.lang;
@@ -87,6 +369,9 @@ export default function ShiftTracker() {
   const [themeName, setThemeName] = useState<ThemeName>("light");
   const t = T[lang];
   const theme = THEMES[themeName];
+
+  // Persistence Key
+  const STORAGE_KEY = "shift_tracker_data_v3";
 
   // State
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
@@ -151,7 +436,6 @@ export default function ShiftTracker() {
     checkVersion();
 
     // Check at 3:00 AM every day
-    let timer: ReturnType<typeof setTimeout> | undefined;
     const scheduleNextThreeAM = () => {
       const now = new Date();
       const threeAM = new Date();
@@ -162,16 +446,14 @@ export default function ShiftTracker() {
       }
       
       const timeout = threeAM.getTime() - now.getTime();
-      timer = setTimeout(async () => {
+      return setTimeout(async () => {
         await checkVersion();
         scheduleNextThreeAM();
       }, timeout);
     };
 
-    scheduleNextThreeAM();
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
+    const timer = scheduleNextThreeAM();
+    return () => clearTimeout(timer);
   }, []);
 
   // Pull to Refresh Logic
@@ -230,7 +512,7 @@ export default function ShiftTracker() {
 
   // Save language separately for ultimate persistence
   useEffect(() => {
-    localStorage.setItem(LANGUAGE_KEY, lang);
+    localStorage.setItem("shift_tracker_preferred_lang", lang);
   }, [lang]);
 
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
