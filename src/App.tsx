@@ -21,22 +21,29 @@ import {
   CheckCircle2,
   AlertCircle,
   Info,
-  RefreshCw
+  RefreshCw,
+  FileSpreadsheet,
+  Database,
+  Download,
+  Upload,
+  MoreHorizontal,
+  Lock,
+  Unlock
 } from "lucide-react";
 
 const HOURS_IN_DAY = 24;
-const APP_VERSION = "3.4";
+const APP_VERSION = "4.0";
 
 const T = {
   ua: {
     appTitle: "Трекер Змін",
     version: "Версія",
-    onboardingTitle: "Оновлення v3.4! 🔋",
-    onboarding1: "Економія заряду: Авто-оновлення тепер лише о 3:00 ночі.",
-    onboarding2: "Свайп вниз: Тягніть екран вниз для ручної перевірки оновлень.",
-    onboarding3: "Пам'ять Профілів: Кожен водій має незалежний календар.",
-    onboarding4: "Синхронізація: Дані миттєво оновлюються між вкладками.",
-    onboarding5: "PWA: Встановіть як додаток для швидкого доступу.",
+    onboardingTitle: "Фінальна версія v4.0! 🏆",
+    onboarding1: "Захист календаря: Натисніть на замок 🔒 у верхній панелі для захисту від випадкових натискань.",
+    onboarding2: "Оптимальний дизайн: Зручні швидкі кнопки-іконки у шапці для миттєвого доступу.",
+    onboarding3: "Автономність: Повністю автономне збереження та робота без розряду батареї.",
+    onboarding4: "Пам'ять Профілів: Кожен водій має незалежні розрахунки, аванси та історію.",
+    onboarding5: "PWA Додаток: Встановіть на робочий стіл Android/iOS для автономного доступу.",
     gotIt: "Зрозумів",
     perShift: "зміна",
     perHour: "год",
@@ -112,16 +119,31 @@ const T = {
     noProfiles: "Немає профілів",
     newUpdate: "Доступне оновлення! 📥",
     updating: "Оновлюємо програму...",
+    pdfReminder: "Нагадування: Сьогодні 1-ше число! Створіть та збережіть PDF звіт.",
+    exportPdf: "Експорт в PDF",
+    exportPdfBtn: "Експорт в PDF",
+    reportTitle: "ЗВІТ ЗМІН ТА АВАНСІВ",
+    period: "Період",
+    driver: "Водій",
+    date: "Дата",
+    totalHoursLabel: "Всього годин",
+    totalShiftsLabel: "Всього змін",
+    shiftNoteLabel: "Примітка до зміни (рейс, авто тощо)",
+    exportCsv: "Експорт в CSV (Excel)",
+    backupJson: "Резервна копія JSON",
+    notePlaceholder: "Маршрут, завантаження, номер авто...",
+    noteLabel: "Примітка",
+    calendarLockedToast: "🔒 Календар заблоковано! Натисніть на замок 🔓 вгорі, щоб редагувати.",
   },
   pl: {
     appTitle: "Tracker Zmian",
     version: "Wersja",
-    onboardingTitle: "Aktualizacja v3.4! 🔋",
-    onboarding1: "Oszczędzanie energii: Auto-aktualizacja tylko o 3:00 rano.",
-    onboarding2: "Swipe w dół: Przeciągnij ekran w dół, aby sprawdzić aktualizacje.",
-    onboarding3: "Pamięć Profili: Każdy kierowca ma niezależną historię.",
-    onboarding4: "Synchronizacja: Dane są aktualizowane między kartami.",
-    onboarding5: "PWA: Zainstaluj jako aplikację dla lepszej wydajności.",
+    onboardingTitle: "Wersja finałowa v4.0! 🏆",
+    onboarding1: "Ochrona kalendarza: Kliknij kłódkę 🔒 u góry, aby chronić przed przypadkowymi zmianami.",
+    onboarding2: "Optymalny design: Wygodne, szybkie przyciski-ikony w nagłówku do natychmiastowego dostępu.",
+    onboarding3: "Szybka autonomia: W pełni autonomiczne zapisywanie i działanie bez rozładowywania baterii.",
+    onboarding4: "Pamięć Profilów: Każdy kierowca posiada oddzielne rozliczenia, zaliczki i historię.",
+    onboarding5: "Aplikacja PWA: Zainstaluj na ekranie głównym Android/iOS dla dostępu offline.",
     gotIt: "Rozumiem",
     perShift: "zmiana",
     perHour: "godz",
@@ -197,6 +219,21 @@ const T = {
     noProfiles: "Brak profilów",
     newUpdate: "Dostępna aktualizacja! 📥",
     updating: "Aktualizowanie aplikacji...",
+    pdfReminder: "Przypomnienie: Dzisiaj jest 1. dzień miesiąca! Wygeneruj i zapisz raport PDF.",
+    exportPdf: "Eksportuj do PDF",
+    exportPdfBtn: "Eksportuj do PDF",
+    reportTitle: "RAPORT ZMIAN I ZALICZEK",
+    period: "Okres",
+    driver: "Kierowca",
+    date: "Data",
+    totalHoursLabel: "Suma godzin",
+    totalShiftsLabel: "Suma zmian",
+    shiftNoteLabel: "Notatka do zmiany (trasa, auto itp.)",
+    exportCsv: "Eksportuj do CSV (Excel)",
+    backupJson: "Kopia zapasowa JSON",
+    notePlaceholder: "Trasa, załadunek, numer auta...",
+    noteLabel: "Notatka",
+    calendarLockedToast: "🔒 Kalendarz zablokowany! Kliknij kłódkę 🔓 u góry, aby edytować.",
   }
 };
 
@@ -320,6 +357,7 @@ interface Shift {
   end: number;
   hours: number;
   manualAmount?: number;
+  note?: string;
 }
 
 interface Advance {
@@ -390,6 +428,7 @@ export default function ShiftTracker() {
   const [modalStart, setModalStart] = useState(8);
   const [modalEnd, setModalEnd] = useState(20);
   const [modalManualAmount, setModalManualAmount] = useState("");
+  const [modalShiftNote, setModalShiftNote] = useState("");
   const [showAdvancesList, setShowAdvancesList] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -405,11 +444,362 @@ export default function ShiftTracker() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [activeRest, setActiveRest] = useState<ActiveRest | null>(null);
   const [lastRestType, setLastRestType] = useState<24 | 45 | null>(null);
-  const [restModal, setRestModal] = useState<{ type: 24 | 45, day: number, hour: number, hoursAlreadyDone: number } | null>(null);
   const [now, setNow] = useState(Date.now());
   const [isUpdating, setIsUpdating] = useState(false);
   const [pullProgress, setPullProgress] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [dismissedPdfReminder, setDismissedPdfReminder] = useState(() => {
+    try {
+      const saved = localStorage.getItem("dismiss_pdf_reminder");
+      const currentLabel = `${today.getFullYear()}-${today.getMonth()}`;
+      return saved === currentLabel;
+    } catch {
+      return false;
+    }
+  });
+
+  const [showActionsMenu, setShowActionsMenu] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [isLocked, setIsLocked] = useState<boolean>(() => {
+    try {
+      const saved = localStorage.getItem("calendar_locked");
+      return saved !== null ? saved === "true" : true;
+    } catch {
+      return true;
+    }
+  });
+  const [showLockToast, setShowLockToast] = useState(false);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("calendar_locked", String(isLocked));
+    } catch {}
+  }, [isLocked]);
+
+  useEffect(() => {
+    if (showLockToast) {
+      const timer = setTimeout(() => setShowLockToast(false), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [showLockToast]);
+
+  const dismissPdfReminder = () => {
+    try {
+      const currentLabel = `${today.getFullYear()}-${today.getMonth()}`;
+      localStorage.setItem("dismiss_pdf_reminder", currentLabel);
+    } catch {}
+    setDismissedPdfReminder(true);
+  };
+
+  const handleExportPdf = () => {
+    const oldTitle = document.title;
+    const cleanDriverName = driverName ? driverName.trim().replace(/\s+/g, "_") : "Driver";
+    const monthIndexFormatted = String(currentMonth + 1).padStart(2, '0');
+    document.title = `Raport_${cleanDriverName}_${currentYear}_${monthIndexFormatted}`;
+    
+    window.print();
+    
+    setTimeout(() => {
+      document.title = oldTitle;
+    }, 1000);
+  };
+
+  const handleExportCsv = () => {
+    let csvContent = "\uFEFF";
+    csvContent += `Report for ${t.months[currentMonth]} ${currentYear}\n`;
+    csvContent += `Driver: ${driverName || "—"}\n\n`;
+    csvContent += "SHIFTS\n";
+    csvContent += "Date,Start,End,Hours,Amount (zł),Note/Comment\n";
+    
+    currentMonthShifts.forEach(day => {
+      const k = shiftKey(currentYear, currentMonth, day);
+      const sh = shifts[k];
+      if (sh) {
+        const displayEarned = sh.manualAmount !== undefined ? sh.manualAmount : sh.hours * hourRate;
+        const note = sh.note ? sh.note.replace(/"/g, '""') : "";
+        csvContent += `${day} ${t.monthsShort[currentMonth]} ${currentYear},${formatHour(sh.start)},${formatHour(sh.end)},${sh.hours},${Math.round(displayEarned)},"${note}"\n`;
+      }
+    });
+    
+    if (monthAdvances.length > 0) {
+      csvContent += "\nADVANCES\n";
+      csvContent += "Amount (zł),Note/Comment\n";
+      monthAdvances.forEach(adv => {
+        const note = adv.note ? adv.note.replace(/"/g, '""') : "";
+        csvContent += `${adv.amount},"${note}"\n`;
+      });
+    }
+    
+    csvContent += "\nSUMMARY\n";
+    csvContent += `Total Shifts,${currentMonthShifts.length}\n`;
+    csvContent += `Total Hours,${totalHours}\n`;
+    csvContent += `Total Advances,${totalAdvances} zł\n`;
+    csvContent += `To Receive,${Math.round(toReceive)} zł\n`;
+    
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const cleanDriverName = driverName ? driverName.trim().replace(/\s+/g, "_") : "Report";
+    const monthIndexFormatted = String(currentMonth + 1).padStart(2, '0');
+    link.href = url;
+    link.setAttribute("download", `Raport_${cleanDriverName}_${currentYear}_${monthIndexFormatted}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportBackupJson = () => {
+    // Export full current state including shifts and advances (compatible with import)
+    const backupObj = {
+      shifts,
+      advances,
+      driver: driverName,
+      year: currentYear,
+      month: currentMonth
+    };
+    const content = JSON.stringify(backupObj, null, 2);
+    const blob = new Blob([content], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const cleanDriverName = driverName ? driverName.trim().replace(/\s+/g, "_") : "Driver";
+    const monthIndexFormatted = String(currentMonth + 1).padStart(2, '0');
+    link.href = url;
+    link.setAttribute("download", `Backup_${cleanDriverName}_${currentYear}_${monthIndexFormatted}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const loadPdfJs = async (): Promise<any> => {
+    if ((window as any).pdfjsLib) {
+      return (window as any).pdfjsLib;
+    }
+    return new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js";
+      script.onload = () => {
+        const pdfjsLib = (window as any).pdfjsLib;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
+        resolve(pdfjsLib);
+      };
+      script.onerror = () => reject(new Error("Failed to load PDF library"));
+      document.head.appendChild(script);
+    });
+  };
+
+  const extractTextFromPdf = async (file: File): Promise<string> => {
+    const pdfjsLib = await loadPdfJs();
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = "";
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const strings = textContent.items.map((item: any) => item.str);
+      fullText += strings.join("\n") + "\n";
+    }
+    return fullText;
+  };
+
+  const parsePdfText = (text: string) => {
+    const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+    
+    let year = new Date().getFullYear();
+    for (const line of lines) {
+      const yrMatch = line.match(/\b(20\d{2})\b/);
+      if (yrMatch) {
+        year = parseInt(yrMatch[1]);
+        break;
+      }
+    }
+
+    let month = new Date().getMonth();
+    const uaMonths = ["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"];
+    const plMonths = ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"];
+    
+    let foundMonth = false;
+    for (const line of lines) {
+      for (let m = 0; m < 12; m++) {
+        const uaRegex = new RegExp(`\\b${uaMonths[m]}\\b`, "i");
+        const plRegex = new RegExp(`\\b${plMonths[m]}\\b`, "i");
+        if (uaRegex.test(line) || plRegex.test(line)) {
+          month = m;
+          foundMonth = true;
+          break;
+        }
+      }
+      if (foundMonth) break;
+    }
+
+    let driver = "";
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.toLowerCase().includes("водій") || line.toLowerCase().includes("kierowca") || line.toLowerCase().includes("driver")) {
+        const colonIndex = line.indexOf(":");
+        if (colonIndex !== -1) {
+          const after = line.substring(colonIndex + 1).trim();
+          if (after && after !== "—") {
+            driver = after;
+            break;
+          }
+        }
+        if (i + 1 < lines.length) {
+          const nextLine = lines[i+1].trim();
+          if (nextLine && nextLine !== "—" && !nextLine.toLowerCase().includes("generated") && !nextLine.toLowerCase().includes("version")) {
+            driver = nextLine;
+            break;
+          }
+        }
+      }
+    }
+
+    const uaShorts = ["Січ","Лют","Бер","Кві","Тра","Чер","Лип","Сер","Вер","Жов","Лис","Гру"];
+    const plShorts = ["Sty","Lut","Mar","Kwi","Maj","Cze","Lip","Sie","Wrz","Paź","Lis","Gru"];
+
+    const parsedShifts: Record<string, Shift> = {};
+    const parsedAdvances: Advance[] = [];
+
+    let inAdvancesSection = false;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      
+      if (line.toLowerCase().includes("lista zaliczek") || line.toLowerCase().includes("список авансів") || line.toLowerCase().includes("advance list")) {
+        inAdvancesSection = true;
+        continue;
+      }
+      if (line.toLowerCase().includes("lista zmian") || line.toLowerCase().includes("список змін") || line.toLowerCase().includes("shift list")) {
+        inAdvancesSection = false;
+        continue;
+      }
+
+      if (!inAdvancesSection) {
+        const dateMatch = line.match(/^\s*(\d{1,2})\s+([A-Za-zА-Яа-яЄєІіЇїҐґ]+)/);
+        if (dateMatch) {
+          const day = parseInt(dateMatch[1]);
+          const shortName = dateMatch[2];
+          
+          const matchUa = uaShorts.findIndex(s => s.toLowerCase() === shortName.toLowerCase());
+          const matchPl = plShorts.findIndex(s => s.toLowerCase() === shortName.toLowerCase());
+          const matchedMonthIdx = matchUa !== -1 ? matchUa : matchPl;
+          
+          if (matchedMonthIdx !== -1 && day >= 1 && day <= 31) {
+            let hours = 24; 
+            let manualAmount: number | undefined = undefined;
+
+            const hoursMatch = line.match(/(\d+)\s*(godz|god|год|perHour|h|H)/);
+            if (hoursMatch) {
+              hours = parseInt(hoursMatch[1]);
+            }
+
+            const zlMatch = line.match(/(\d+)\s*(zł|zl)/);
+            if (zlMatch) {
+              manualAmount = parseInt(zlMatch[1]);
+            }
+
+            const k = shiftKey(year, month, day);
+            parsedShifts[k] = {
+              start: 0,
+              end: hours,
+              hours,
+              manualAmount
+            };
+          }
+        }
+      } else {
+        const advMatch = line.match(/^(\d+)\s*(zł|zl)\s*(.*)$/i);
+        if (advMatch) {
+          const amount = parseInt(advMatch[1]);
+          let note = advMatch[3]?.trim();
+          if (note === "—") note = "";
+          
+          parsedAdvances.push({
+            id: Date.now() + Math.floor(Math.random() * 100000) + i,
+            amount,
+            note
+          });
+        }
+      }
+    }
+
+    return {
+      year,
+      month,
+      shifts: parsedShifts,
+      advances: parsedAdvances,
+      driver
+    };
+  };
+
+  const handleImportFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    let totalShiftsAdded = 0;
+    let totalAdvancesAdded = 0;
+    const monthsUpdated: string[] = [];
+
+    let tempShifts = { ...shifts };
+    let tempAdvances = { ...advances };
+
+    for (let idx = 0; idx < files.length; idx++) {
+      const file = files[idx];
+      
+      if (file.name.endsWith(".json")) {
+        try {
+          const content = await file.text();
+          const parsed = JSON.parse(content);
+          
+          if (parsed && typeof parsed === "object") {
+            if (parsed.shifts) {
+              tempShifts = { ...tempShifts, ...parsed.shifts };
+              totalShiftsAdded += Object.keys(parsed.shifts).length;
+            }
+            if (parsed.advances) {
+              for (const k in parsed.advances) {
+                tempAdvances[k] = parsed.advances[k];
+                totalAdvancesAdded += parsed.advances[k].length;
+              }
+            }
+            const label = parsed.month && parsed.year ? `${t.months[parsed.month]} ${parsed.year}` : "Imported JSON";
+            monthsUpdated.push(label);
+          }
+        } catch (err) {
+          console.error("JSON parse error:", err);
+        }
+      } else if (file.name.endsWith(".pdf")) {
+        try {
+          const text = await extractTextFromPdf(file);
+          const result = parsePdfText(text);
+          
+          if (result) {
+            tempShifts = { ...tempShifts, ...result.shifts };
+            totalShiftsAdded += Object.keys(result.shifts).length;
+
+            const mk = monthAdvKey(result.year, result.month);
+            tempAdvances[mk] = result.advances;
+            totalAdvancesAdded += result.advances.length;
+
+            const label = `${t.months[result.month]} ${result.year}`;
+            monthsUpdated.push(label);
+          }
+        } catch (err) {
+          console.error("PDF parse error:", err);
+        }
+      }
+    }
+
+    setShifts(tempShifts);
+    setAdvances(tempAdvances);
+
+    const uniqueMonths = Array.from(new Set(monthsUpdated));
+    const uaMsg = `Успішно імпортовано дані за ${uniqueMonths.join(", ")}! Додано/оновлено ${totalShiftsAdded} змін та ${totalAdvancesAdded} авансів.`;
+    const plMsg = `Pomyślnie zaimportowano dane dla ${uniqueMonths.join(", ")}! Dodano/zaktualizowano ${totalShiftsAdded} zmian i ${totalAdvancesAdded} zaliczek.`;
+    
+    alert(lang === "ua" ? uaMsg : plMsg);
+  };
 
   // Optimized Version Check
   const checkVersion = async () => {
@@ -430,31 +820,6 @@ export default function ShiftTracker() {
     }
     return false;
   };
-
-  useEffect(() => {
-    // Initial check on mount
-    checkVersion();
-
-    // Check at 3:00 AM every day
-    const scheduleNextThreeAM = () => {
-      const now = new Date();
-      const threeAM = new Date();
-      threeAM.setHours(3, 0, 0, 0);
-      
-      if (now > threeAM) {
-        threeAM.setDate(threeAM.getDate() + 1);
-      }
-      
-      const timeout = threeAM.getTime() - now.getTime();
-      return setTimeout(async () => {
-        await checkVersion();
-        scheduleNextThreeAM();
-      }, timeout);
-    };
-
-    const timer = scheduleNextThreeAM();
-    return () => clearTimeout(timer);
-  }, []);
 
   // Pull to Refresh Logic
   const pullThreshold = 100;
@@ -661,10 +1026,12 @@ export default function ShiftTracker() {
       setModalStart(shifts[k].start);
       setModalEnd(shifts[k].end);
       setModalManualAmount(shifts[k].manualAmount ? String(shifts[k].manualAmount) : "");
+      setModalShiftNote(shifts[k].note || "");
     } else {
       setModalStart(8);
       setModalEnd(20);
       setModalManualAmount("");
+      setModalShiftNote("");
     }
     setSelectedDay(day);
   };
@@ -686,6 +1053,10 @@ export default function ShiftTracker() {
   };
 
   const handlePointerDown = (day: number) => {
+    if (isLocked) {
+      setShowLockToast(true);
+      return;
+    }
     didLongPress.current = false;
     setDragStart(day);
     setDragCurrent(day);
@@ -696,6 +1067,7 @@ export default function ShiftTracker() {
   };
 
   const handlePointerEnter = (day: number) => {
+    if (isLocked) return;
     if (dragStart !== null) {
       setDragCurrent(day);
       // If we move to a different day, cancel the long press timer
@@ -706,6 +1078,7 @@ export default function ShiftTracker() {
   };
 
   const handlePointerUp = (day: number) => {
+    if (isLocked) return;
     if (pressTimer.current) clearTimeout(pressTimer.current);
 
     if (dragStart !== null && dragCurrent !== null && dragStart !== dragCurrent) {
@@ -756,7 +1129,7 @@ export default function ShiftTracker() {
 
     setShifts(prev => ({
       ...prev,
-      [k]: { start: modalStart, end: modalEnd, hours: finalHours, manualAmount }
+      [k]: { start: modalStart, end: modalEnd, hours: finalHours, manualAmount, note: modalShiftNote.trim() || undefined }
     }));
     setSelectedDay(null);
   };
@@ -844,23 +1217,14 @@ export default function ShiftTracker() {
   };
 
   const startRest = (type: 24 | 45) => {
-    setRestModal({ type, day: today.getDate(), hour: today.getHours(), hoursAlreadyDone: 0 });
-  };
-
-  const confirmRest = () => {
-    if (!restModal) return;
-    const startOffset = (restModal.hoursAlreadyDone || 0) * 60 * 60 * 1000;
-    const start = new Date(currentYear, currentMonth, restModal.day, restModal.hour).getTime() - startOffset;
-    
     // Compensation logic
-    let target = restModal.type;
-    if (restModal.type === 45 && lastRestType === 24) {
+    let target: number = type;
+    if (type === 45 && lastRestType === 24) {
       target = 66; // 45 + 21h compensation
     }
     
-    setActiveRest({ type: restModal.type, startTime: start, targetHours: target });
-    setLastRestType(restModal.type);
-    setRestModal(null);
+    setActiveRest({ type, startTime: Date.now(), targetHours: target });
+    setLastRestType(type);
   };
 
   // Calculations
@@ -987,12 +1351,41 @@ export default function ShiftTracker() {
         )}
       </AnimatePresence>
       {/* Background Decor */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none print:hidden">
         <div className={`absolute top-[-10%] right-[-10%] w-[50%] h-[50%] ${themeName === 'light' ? 'bg-purple-200/40' : 'bg-purple-900/20'} rounded-full blur-[120px]`} />
         <div className={`absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] ${themeName === 'light' ? 'bg-amber-100/40' : 'bg-amber-900/10'} rounded-full blur-[120px]`} />
       </div>
 
-      <div className="relative z-10 max-w-md mx-auto px-4 py-8 pb-24">
+      {/* Calendar Lock Toast Alert */}
+      <AnimatePresence>
+        {showLockToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.9 }}
+            className="fixed top-20 inset-x-4 mx-auto z-[250] max-w-sm pointer-events-auto"
+          >
+            <div className="p-4 rounded-2xl bg-rose-600 text-white shadow-2xl flex items-center gap-3 border border-rose-500">
+              <div className="p-1.5 bg-white/20 rounded-lg shrink-0">
+                <Lock size={16} className="animate-pulse" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-bold leading-normal">
+                  {t.calendarLockedToast}
+                </p>
+              </div>
+              <button 
+                onClick={() => setShowLockToast(false)} 
+                className="p-1 text-white/60 hover:text-white transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="relative z-10 max-w-md mx-auto px-4 py-8 pb-24 print:hidden">
         
         {/* Header */}
         <header className="flex items-start justify-between mb-8">
@@ -1004,6 +1397,9 @@ export default function ShiftTracker() {
             >
               {t.appTitle}
             </motion.div>
+            <div className={`text-[8px] font-medium tracking-[0.2em] uppercase ${theme.textMuted} -mt-1 mb-2 opacity-50`}>
+              Create by Valentyn
+            </div>
             <div className="flex items-baseline gap-2">
               <input
                 type="number"
@@ -1025,20 +1421,123 @@ export default function ShiftTracker() {
             </motion.div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 items-center shrink-0 select-none">
+            {/* Actions Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowActionsMenu(!showActionsMenu)}
+                className={`w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center ${theme.accentMuted} border ${theme.border} rounded-xl text-xs font-bold ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
+                title={lang === "ua" ? "Дії / Експорт" : "Akcje / Eksport"}
+              >
+                <Download size={14} className="opacity-80" />
+              </button>
+
+              <AnimatePresence>
+                {showActionsMenu && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-[150]" 
+                      onClick={() => setShowActionsMenu(false)}
+                    />
+                    
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                      className={`absolute right-0 mt-2 w-56 rounded-2xl ${themeName === 'light' ? 'bg-white shadow-xl' : 'bg-[#1a1a2e]' } shadow-[0_10px_30px_rgba(0,0,0,0.5)] border ${theme.border} p-1.5 z-[160] overflow-hidden`}
+                    >
+                      <button
+                        onClick={() => {
+                          setShowActionsMenu(false);
+                          handleExportPdf();
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-emerald-500`}
+                      >
+                        <Save size={14} />
+                        <span>{t.exportPdf}</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setShowActionsMenu(false);
+                          handleExportCsv();
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-blue-500`}
+                      >
+                        <FileSpreadsheet size={14} />
+                        <span>{(t as any).exportCsv}</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setShowActionsMenu(false);
+                          handleExportBackupJson();
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-indigo-500`}
+                      >
+                        <Database size={14} />
+                        <span>{(t as any).backupJson}</span>
+                      </button>
+
+                      <div className={`h-px ${themeName === 'light' ? 'bg-slate-200' : 'bg-white/10'} my-1`} />
+
+                      <div className="relative">
+                        <input 
+                          type="file"
+                          ref={fileInputRef}
+                          accept=".pdf,.json"
+                          multiple
+                          onChange={(e) => {
+                            setShowActionsMenu(false);
+                            handleImportFiles(e);
+                          }}
+                          className="hidden"
+                        />
+                        <button
+                          onClick={() => {
+                            fileInputRef.current?.click();
+                          }}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-amber-500`}
+                        >
+                          <Upload size={14} />
+                          <span>{lang === "ua" ? "Імпорт PDF/JSON" : "Import PDF/JSON"}</span>
+                        </button>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Calendar Protection Lock */}
+            <button
+              onClick={() => setIsLocked(!isLocked)}
+              className={`w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center border rounded-xl transition-all duration-300 hover:scale-[1.05] active:scale-95 ${
+                isLocked
+                  ? 'bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500/25'
+                  : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/25'
+              }`}
+              title={isLocked ? (lang === 'ua' ? "Календар заблоковано. Натисніть, щоб дозволити зміни" : "Kalendarz zablokowany. Kliknij, aby zezwolić na zmiany") : (lang === 'ua' ? "Блокування змін календаря" : "Zablokuj kalendarz przed zmianami")}
+            >
+              {isLocked ? <Lock size={14} className="opacity-85" /> : <Unlock size={14} className="opacity-85" />}
+            </button>
+
+            {/* Theme Selector */}
             <button
               onClick={nextTheme}
-              className={`flex items-center gap-2 ${theme.accentMuted} border ${theme.border} rounded-xl px-3 py-2 text-xs font-bold ${theme.accentText} transition-colors`}
+              className={`w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center ${theme.accentMuted} border ${theme.border} rounded-xl text-sm ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
               title={t.theme}
             >
-              {themeName === 'light' ? '☀️' : themeName === 'deep-night' ? '🌌' : themeName === 'midnight' ? '🌊' : themeName === 'forest' ? '🌲' : '🌇'}
+              <span className="text-sm select-none">{themeName === 'light' ? '☀️' : themeName === 'deep-night' ? '🌌' : themeName === 'midnight' ? '🌊' : themeName === 'forest' ? '🌲' : '🌇'}</span>
             </button>
+
+            {/* Language Selector */}
             <button
               onClick={() => setLang(l => l === "ua" ? "pl" : "ua")}
-              className={`flex items-center gap-2 ${theme.accentMuted} border ${theme.border} rounded-xl px-3 py-2 text-xs font-bold ${theme.accentText} transition-colors`}
+              className={`w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center ${theme.accentMuted} border ${theme.border} rounded-xl text-xs font-black ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
+              title={lang === "ua" ? "Zmiana języka na Polski" : "Зміна мови на Українську"}
             >
-              <Globe size={14} />
-              {lang.toUpperCase()}
+              <Globe size={14} className="opacity-80" />
             </button>
           </div>
         </header>
@@ -1065,137 +1564,44 @@ export default function ShiftTracker() {
           </button>
         </div>
 
-        {/* History Action & Rest Control */}
-        <div className="mb-6 flex gap-2">
-          <button 
-            onClick={() => setShowHistory(true)}
-            className={`flex-1 py-4 bg-purple-500/5 border border-purple-500/20 rounded-2xl flex items-center justify-center gap-3 text-purple-400 group hover:bg-purple-500/10 transition-all`}
-          >
-            <CalendarIcon size={18} className="opacity-60" />
-            <span className="text-xs font-black uppercase tracking-[0.2em]">{t.history}</span>
-          </button>
-          <div className="flex gap-2 flex-1">
-            <button 
-              onClick={() => startRest(24)}
-              className={`flex-1 flex flex-col items-center justify-center py-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl gap-1 text-amber-500 hover:bg-amber-500/20 transition-all active:scale-95 relative overflow-hidden`}
-            >
-              <span className="text-[10px] font-black uppercase opacity-60">{t.menu24}</span>
-              <span className="text-sm font-black">START 24</span>
-              {lastRestType === 45 && (
-                <div className="absolute top-1 right-1 px-1.5 py-0.5 bg-amber-500 text-[6px] font-black rounded text-black uppercase">ALLOWED</div>
-              )}
-            </button>
-            <button 
-              onClick={() => startRest(45)}
-              className={`flex-1 flex flex-col items-center justify-center py-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl gap-1 text-emerald-500 hover:bg-emerald-500/20 transition-all active:scale-95 relative overflow-hidden`}
-            >
-              <span className="text-[10px] font-black uppercase opacity-60">{t.menu45}</span>
-              <span className="text-sm font-black">START 45</span>
-              {lastRestType === 24 && (
-                <div className="absolute top-1 right-1 px-1.5 py-0.5 bg-emerald-500 text-[6px] font-black rounded text-black uppercase">REQUIRED</div>
-              )}
-            </button>
-          </div>
-        </div>
 
-        {/* Active Rest Panel */}
-        <AnimatePresence>
-          {activeRest && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className={`mb-6 p-5 rounded-[32px] border ${activeRest.type === 45 ? 'border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_20px_rgba(16,185,129,0.1)]' : 'border-amber-500/30 bg-amber-500/5 shadow-[0_0_20px_rgba(245,158,11,0.1)]'} backdrop-blur-xl relative overflow-hidden`}
-            >
-              <div className="flex items-center justify-between mb-4 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-xl ${activeRest.type === 45 ? 'bg-emerald-500 text-black' : 'bg-amber-500 text-black'}`}>
-                    <Clock size={16} />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-black uppercase tracking-widest opacity-60">{t.activeRest}</div>
-                    <div className="text-sm font-black">{activeRest.type}H PAUSE</div>
-                  </div>
-                </div>
+
+        {/* Monthly PDF Export Reminder */}
+        {today.getDate() === 1 && !dismissedPdfReminder && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`mb-6 p-5 rounded-3xl border border-amber-500/30 bg-amber-500/5 backdrop-blur-xl relative overflow-hidden`}
+          >
+            <div className="flex items-start gap-4">
+              <div className="p-2.5 bg-amber-500 text-black rounded-xl">
+                <AlertCircle size={18} />
+              </div>
+              <div className="flex-1 pr-6">
+                <span className="text-[10px] font-black uppercase tracking-widest text-amber-500">
+                  {lang === 'ua' ? 'Нагадування' : 'Przypomnienie'}
+                </span>
+                <p className="text-xs font-bold leading-normal mt-1 opacity-90">
+                  {t.pdfReminder}
+                </p>
                 <button 
-                  onClick={() => setActiveRest(null)}
-                  className={`p-2 hover:bg-black/5 rounded-full opacity-40 hover:opacity-100 transition-all`}
+                  onClick={handleExportPdf}
+                  className="mt-3 text-[10px] font-black uppercase tracking-widest bg-amber-500 hover:bg-amber-600 text-black px-4 py-2 rounded-xl transition-all"
                 >
-                  <Trash2 size={16} />
+                  {t.exportPdfBtn}
                 </button>
               </div>
+              <button 
+                onClick={dismissPdfReminder}
+                className="absolute top-4 right-4 p-1 hover:bg-white/10 rounded-full opacity-40 hover:opacity-100 transition-all text-current"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </motion.div>
+        )}
 
-              {(() => {
-                const totalMs = 144 * 60 * 60 * 1000; // EU 6-day rule (144 hours)
-                const elapsedMs = now - activeRest.startTime;
-                const remainingMs = Math.max(0, totalMs - elapsedMs);
-                const progress = Math.min(100, (elapsedMs / totalMs) * 100);
-                
-                const rHours = Math.floor(remainingMs / (1000 * 60 * 60));
-                const rMins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-                
-                return (
-                  <div className="relative z-10">
-                    <div className="flex justify-between items-end mb-2">
-                      <div className="text-[10px] font-bold opacity-40 uppercase">{t.restRemaining}</div>
-                      <div className={`text-2xl font-black ${progress >= 100 ? 'text-red-500' : ''}`}>
-                        {progress >= 100 ? t.restDone : `${rHours}h ${rMins}m`}
-                      </div>
-                    </div>
-                    
-                    <div className="h-2 bg-black/10 rounded-full overflow-hidden mb-3">
-                      <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: `${progress}%` }}
-                        className={`h-full ${activeRest.type === 45 ? 'bg-emerald-500' : 'bg-amber-500 underline decoration-black/20'} shadow-[0_0_10px_rgba(0,0,0,0.1)]`}
-                      />
-                    </div>
 
-                    <div className={`mb-4 p-3 rounded-xl border flex flex-col gap-2 ${activeRest.type === 45 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/10 border-amber-500/20 text-amber-400'}`}>
-                      <div className="flex items-start gap-2.5">
-                        {activeRest.type === 45 ? <CheckCircle2 size={14} className="mt-0.5" /> : <AlertCircle size={14} className="mt-0.5" />}
-                        <div className="text-[9px] font-black leading-normal uppercase">
-                          {activeRest.type === 45 ? t.after45Notice : t.after24Notice}
-                        </div>
-                      </div>
-                      
-                      {activeRest.targetHours === 66 && activeRest.type === 45 && (
-                        <div className="mt-1 pt-2 border-t border-emerald-500/10 flex items-start gap-2.5 opacity-80">
-                          <Clock size={12} className="mt-0.5" />
-                          <div>
-                            <div className="text-[8px] font-black uppercase tracking-wider">{t.compensation}</div>
-                            <div className="text-[10px] font-bold">21 {t.compHours}</div>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {activeRest.type === 24 && (
-                         <div className="mt-1 pt-2 border-t border-amber-500/10 text-[8px] font-black uppercase tracking-tight opacity-80">
-                            {t.compWarning}
-                         </div>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-[9px] font-bold opacity-30 uppercase mb-0.5">{t.restSince}</div>
-                        <div className="text-xs font-bold opacity-80">
-                          {new Date(activeRest.startTime).toLocaleDateString(lang === 'ua' ? 'uk-UA' : 'pl-PL', { day: '2-digit', month: 'short' })} {new Date(activeRest.startTime).getHours()}:00
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-[9px] font-bold opacity-30 uppercase mb-0.5">{t.restUntil}</div>
-                        <div className="text-xs font-bold opacity-80 text-red-400">
-                          {new Date(activeRest.startTime + totalMs).toLocaleDateString(lang === 'ua' ? 'uk-UA' : 'pl-PL', { day: '2-digit', month: 'short' })} {new Date(activeRest.startTime + totalMs).getHours()}:00
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* Calendar Card */}
         <section className={`${theme.card} border ${theme.border} rounded-[32px] p-6 backdrop-blur-xl shadow-2xl mb-6 transition-colors`}>
@@ -1245,14 +1651,17 @@ export default function ShiftTracker() {
                     ${dragStart !== null && dragCurrent !== null && day >= Math.min(dragStart, dragCurrent) && day <= Math.max(dragStart, dragCurrent) ? 'scale-105 ring-2 ring-inset ring-white/50 z-10' : ''}
                   `}
                 >
-                  <span className={`text-sm leading-none ${shift ? 'font-black text-white' : 'font-medium'}`}>{day}</span>
+                  <span className={`text-[13px] sm:text-sm leading-none ${shift ? 'font-black text-white -mt-3 pb-0.5' : 'font-medium'}`}>{day}</span>
+                  {shift?.note && (
+                    <div className="absolute top-1.5 right-1.5 w-1 h-1 bg-amber-400 rounded-full" />
+                  )}
                   {shift && (
-                    <div className="absolute bottom-1 w-full text-center">
-                      <div className="text-[7px] sm:text-[8px] font-black text-white/80 leading-none">
+                    <div className="absolute bottom-1 right-0 left-0 text-center flex flex-col items-center justify-center">
+                      <span className="text-[7px] sm:text-[8px] font-black text-white/95 leading-none">
                         {shift.hours}H
-                      </div>
+                      </span>
                       {shift.manualAmount !== undefined && (
-                        <div className="text-[5px] sm:text-[6px] font-black text-amber-300 uppercase leading-tight">zł!</div>
+                        <span className="text-[5px] sm:text-[6px] font-black text-amber-300 uppercase leading-none mt-0.5">zł!</span>
                       )}
                     </div>
                   )}
@@ -1360,12 +1769,7 @@ export default function ShiftTracker() {
           )}
         </motion.button>
 
-        {/* Developer Attribution */}
-        <div className="text-center mt-8 opacity-40">
-          <span className={`text-[9px] font-black tracking-[0.2em] uppercase`}>
-            Created by Valentyn
-          </span>
-        </div>
+
 
         {/* Advances Content */}
         <AnimatePresence>
@@ -1449,6 +1853,19 @@ export default function ShiftTracker() {
           )}
         </AnimatePresence>
 
+        {/* History Action (Moved under calendar and advances) */}
+        <div className="mt-8">
+          <button 
+            onClick={() => setShowHistory(true)}
+            className={`w-full py-4 bg-purple-500/5 hover:bg-purple-500/10 border border-purple-500/20 rounded-2xl flex items-center justify-center gap-2 text-purple-400 group transition-all duration-300 shadow-md hover:shadow-purple-500/10`}
+          >
+            <CalendarIcon size={16} className="opacity-60 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-black uppercase tracking-wider">{t.history}</span>
+          </button>
+        </div>
+
+
+
         {/* Footer Version */}
         <div className="mt-12 mb-4 text-center">
           <button 
@@ -1483,9 +1900,9 @@ export default function ShiftTracker() {
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              className={`relative w-full max-w-sm ${themeName === 'light' ? 'bg-white' : 'bg-[#1a1a2e]'} border ${theme.border} rounded-[32px] overflow-hidden shadow-2xl`}
+              className={`relative w-full max-w-sm ${themeName === 'light' ? 'bg-white' : 'bg-[#1a1a2e]'} border ${theme.border} rounded-[32px] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl`}
             >
-              <div className="p-8">
+              <div className="p-6">
                 <div className="flex items-center justify-between mb-8">
                   <div>
                     <div className="text-2xl font-black text-current">{selectedDay} {t.months[currentMonth]}</div>
@@ -1533,7 +1950,7 @@ export default function ShiftTracker() {
                   </div>
                 </div>
 
-                <div className="mb-8">
+                <div className="mb-6">
                   <label className={`block text-[10px] font-black ${theme.textMuted} uppercase tracking-widest mb-3`}>{t.manualAmountLabel}</label>
                   <input
                     type="number"
@@ -1541,6 +1958,17 @@ export default function ShiftTracker() {
                     onChange={e => setModalManualAmount(e.target.value)}
                     placeholder="0"
                     className={`w-full ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border ${theme.border} rounded-2xl py-4 px-4 text-current font-black text-lg focus:outline-none focus:ring-2 focus:ring-${theme.accent}/40`}
+                  />
+                </div>
+
+                <div className="mb-8">
+                  <label className={`block text-[10px] font-black ${theme.textMuted} uppercase tracking-widest mb-3`}>{(t as any).shiftNoteLabel}</label>
+                  <input
+                    type="text"
+                    value={modalShiftNote}
+                    onChange={e => setModalShiftNote(e.target.value)}
+                    placeholder={(t as any).notePlaceholder}
+                    className={`w-full ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border ${theme.border} rounded-2xl py-4 px-4 text-base font-semibold focus:outline-none focus:ring-2 focus:ring-${theme.accent}/40`}
                   />
                 </div>
 
@@ -1606,9 +2034,9 @@ export default function ShiftTracker() {
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              className={`relative w-full max-w-sm ${themeName === 'light' ? 'bg-white' : 'bg-[#1a1a2e]'} border ${theme.border} rounded-[32px] overflow-hidden shadow-2xl`}
+              className={`relative w-full max-w-sm ${themeName === 'light' ? 'bg-white' : 'bg-[#1a1a2e]'} border ${theme.border} rounded-[32px] max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl`}
             >
-              <div className="p-8">
+              <div className="p-6">
                 <div className="flex items-center justify-between mb-8">
                   <div>
                     <div className="text-2xl font-black text-current">{t.addAdvance}</div>
@@ -1643,31 +2071,18 @@ export default function ShiftTracker() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  {!needsAdvanceConfirm ? (
-                    <button
-                      onClick={() => {
-                        const amt = parseFloat(advanceAmount);
-                        if (!isNaN(amt) && amt > 0) setNeedsAdvanceConfirm(true);
-                      }}
-                      className={`w-full py-4 bg-${theme.secondary} hover:opacity-90 rounded-2xl ${themeName === 'light' ? 'text-white' : 'text-black'} font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2`}
-                    >
-                      <Save size={18} />
-                      {t.save}
-                    </button>
-                  ) : (
-                    <motion.button
-                      initial={{ scale: 0.95, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      onClick={saveAdvance}
-                      className={`w-full py-4 bg-emerald-500 hover:opacity-90 rounded-2xl text-white font-black uppercase tracking-widest transition-all flex flex-col items-center justify-center gap-0.5 shadow-lg shadow-emerald-500/20`}
-                    >
-                      <span className="text-[10px] opacity-70">{t.confirmAdvance}</span>
-                      <div className="flex items-center gap-2">
-                         <CheckCircle2 size={16} />
-                         <span>{t.yesAdd}</span>
-                      </div>
-                    </motion.button>
-                  )}
+                  <button
+                    onClick={saveAdvance}
+                    disabled={!advanceAmount || parseFloat(advanceAmount) <= 0}
+                    className={`w-full py-4 ${
+                      !advanceAmount || parseFloat(advanceAmount) <= 0
+                        ? 'opacity-30 cursor-not-allowed'
+                        : 'hover:opacity-90 active:scale-[0.99]'
+                    } bg-${theme.secondary} rounded-2xl ${themeName === 'light' ? 'text-white' : 'text-black'} font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2`}
+                  >
+                    <CheckCircle2 size={18} />
+                    <span>OK</span>
+                  </button>
                   <button
                     onClick={() => setAdvanceModal(false)}
                     className={`w-full py-2 ${theme.textMuted} text-xs font-bold uppercase tracking-widest hover:text-current transition-colors`}
@@ -1804,128 +2219,7 @@ export default function ShiftTracker() {
         )}
       </AnimatePresence>
 
-      {/* REST START MODAL */}
-      <AnimatePresence>
-        {restModal && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setRestModal(null)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            />
-            <motion.div 
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              className={`relative w-full max-w-sm ${themeName === 'light' ? 'bg-white' : 'bg-[#1a1a2e]'} border ${theme.border} rounded-[32px] overflow-hidden shadow-2xl p-8`}
-            >
-              <div className="flex items-center justify-between mb-8">
-                <div className={`p-3 rounded-2xl ${restModal.type === 45 ? 'bg-emerald-500/20 text-emerald-500' : 'bg-amber-500/20 text-amber-500'}`}>
-                  <CalendarIcon size={24} />
-                </div>
-                <button onClick={() => setRestModal(null)} className={`p-2 ${theme.textMuted} hover:text-current transition-colors`}>
-                  <X size={24} />
-                </button>
-              </div>
 
-              <div className="mb-6">
-                <h3 className="text-xl font-black mb-1">{restModal.type === 45 ? t.start45 : t.start24}</h3>
-                <p className={`text-xs ${theme.textMuted} font-medium uppercase tracking-widest`}>{t.selectStart}</p>
-              </div>
-
-              {/* Linked Logic Hint */}
-              <div className={`mb-6 p-4 rounded-2xl border ${restModal.type === 45 ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400' : 'bg-amber-500/5 border-amber-500/20 text-amber-400'}`}>
-                <div className="flex items-center gap-3 mb-2">
-                   <div className={`p-1.5 rounded-lg ${restModal.type === 45 ? 'bg-emerald-500 text-black' : 'bg-amber-500 text-black'}`}>
-                      <Info size={14} />
-                   </div>
-                   <div className="text-[10px] font-black uppercase tracking-widest leading-none">
-                     {restModal.type === 45 ? t.menu45 : t.menu24}
-                   </div>
-                </div>
-                <div className="text-xs font-bold leading-relaxed opacity-80">
-                  {restModal.type === 45 && lastRestType === 24 
-                    ? `+21h ${t.compensation}` 
-                    : restModal.type === 24 
-                      ? t.after24Notice 
-                      : t.after45Notice
-                  }
-                </div>
-              </div>
-
-              <div className="space-y-6 mb-8">
-                <div>
-                  <label className={`block text-[10px] font-black ${theme.textMuted} uppercase tracking-widest mb-3`}>{t.monthsShort[currentMonth]}</label>
-                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
-                    {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(d => (
-                      <button
-                        key={d}
-                        onClick={() => setRestModal({ ...restModal, day: d })}
-                        className={`shrink-0 w-12 h-12 rounded-xl flex flex-col items-center justify-center border transition-all ${restModal.day === d ? (restModal.type === 45 ? 'bg-emerald-500 border-emerald-500 text-black font-black' : 'bg-amber-500 border-amber-500 text-black font-black') : `bg-white/5 ${theme.border} ${theme.textMuted}`}`}
-                      >
-                        <span className="text-xs">{d}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className={`block text-[10px] font-black ${theme.textMuted} uppercase tracking-widest mb-3`}>{t.start}</label>
-                  <div className="relative">
-                    <select 
-                      value={restModal.hour}
-                      onChange={(e) => setRestModal({ ...restModal, hour: Number(e.target.value) })}
-                      className={`w-full appearance-none ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border ${theme.border} rounded-2xl py-4 px-4 text-current font-black text-lg focus:outline-none focus:ring-2 focus:ring-${restModal.type === 45 ? 'emerald-500' : 'amber-500'}/40`}
-                    >
-                      {Array.from({ length: 24 }, (_, i) => (
-                        <option key={i} value={i} className={themeName === 'light' ? 'bg-white' : 'bg-[#1a1a2e]'}>{formatHour(i)}</option>
-                      ))}
-                    </select>
-                    <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-30`}>
-                      <Clock size={18} />
-                    </div>
-                  </div>
-                </div>
-
-                {restModal.type === 24 && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="pt-2"
-                  >
-                    <label className={`block text-[10px] font-black amber-500 uppercase tracking-widest mb-3`}>
-                      {t.hoursDoneLabel}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="number"
-                        min="0"
-                        max="24"
-                        value={restModal.hoursAlreadyDone}
-                        onChange={(e) => setRestModal({ ...restModal, hoursAlreadyDone: Math.min(24, Math.max(0, Number(e.target.value))) })}
-                        className={`w-full ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border border-amber-500/30 rounded-2xl py-4 px-4 text-current font-black text-lg focus:outline-none focus:ring-2 focus:ring-amber-500/40`}
-                        placeholder="0"
-                      />
-                      <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-amber-500 opacity-30`}>
-                        <Clock size={18} />
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-
-              <button
-                onClick={confirmRest}
-                className={`w-full py-4 ${restModal.type === 45 ? 'bg-emerald-500' : 'bg-amber-500'} hover:opacity-90 rounded-2xl text-black font-black uppercase tracking-widest transition-all shadow-xl shadow-emerald-500/10`}
-              >
-                {t.save}
-              </button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
 
       {/* RESET CONFIRMATION MODAL */}
       <AnimatePresence>
@@ -2126,6 +2420,110 @@ export default function ShiftTracker() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Dynamic Print-Only PDF Layout */}
+      <div className="hidden print:block w-full min-h-screen bg-white text-black font-sans px-8 py-10 antialiased">
+        <div className="max-w-3xl mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center border-b border-slate-300 pb-6 mb-8">
+            <div>
+              <h1 className="text-2xl font-black tracking-tight text-slate-900">{t.reportTitle}</h1>
+              <p className="text-xs text-slate-500 mt-1 uppercase tracking-wider font-bold">
+                {t.period}: <span className="text-slate-800">{t.months[currentMonth]} {currentYear}</span>
+              </p>
+            </div>
+            <div className="text-right">
+              <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">{t.driver}</span>
+              <p className="text-base font-black text-slate-800">{driverName || "—"}</p>
+              <p className="text-[9px] text-slate-400 mt-1">Generated via App v{APP_VERSION}</p>
+            </div>
+          </div>
+
+          {/* Quick Stats Grid */}
+          <div className="grid grid-cols-4 gap-4 pb-6 mb-8 border-b border-slate-200">
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">{t.shifts}</span>
+              <span className="text-xl font-extrabold text-slate-800">{currentMonthShifts.length}</span>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">{t.totalHoursLabel}</span>
+              <span className="text-xl font-extrabold text-slate-800">{totalHours} {t.perHour}</span>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">{t.totalAdvances}</span>
+              <span className="text-xl font-extrabold text-red-500 flex items-center">-{totalAdvances} zł</span>
+            </div>
+            <div className="p-4 bg-slate-50 rounded-xl">
+              <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">{t.toReceive}</span>
+              <span className="text-xl font-extrabold text-green-600 font-mono">{Math.round(toReceive)} zł</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-10">
+            {/* Shifts Table */}
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-widest text-slate-800 mb-4 pb-2 border-b-2 border-slate-900">{t.shiftList}</h2>
+              {currentMonthShifts.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">No shifts registered.</p>
+              ) : (
+                <table className="w-full text-xs text-slate-700">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-[9px] uppercase font-black text-slate-400">
+                      <th className="py-2 text-left">{t.date}</th>
+                      <th className="py-2 text-center">{t.hours}</th>
+                      <th className="py-2 text-right">{t.earned}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentMonthShifts.map(day => {
+                      const k = shiftKey(currentYear, currentMonth, day);
+                      const sh = shifts[k];
+                      const displayEarned = sh?.manualAmount !== undefined ? sh.manualAmount : (sh?.hours || 0) * hourRate;
+                      return (
+                        <tr key={day} className="border-b border-slate-100">
+                          <td className="py-2 text-slate-900">
+                            <span className="font-bold">{day} {t.monthsShort[currentMonth]}</span>
+                            {sh?.note && <span className="block text-[9px] text-slate-500 font-medium italic mt-0.5 leading-tight">{sh.note}</span>}
+                          </td>
+                          <td className="py-2 text-center font-semibold">{sh?.hours || 0} {t.perHour}</td>
+                          <td className="py-2 text-right font-black text-slate-900">{Math.round(displayEarned)} zł</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* Advances Table */}
+            <div>
+              <h2 className="text-sm font-black uppercase tracking-widest text-slate-800 mb-4 pb-2 border-b-2 border-slate-900">{t.advanceList}</h2>
+              {monthAdvances.length === 0 ? (
+                <p className="text-xs text-slate-400 italic">{t.noAdvances}</p>
+              ) : (
+                <table className="w-full text-xs text-slate-700">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-[9px] uppercase font-black text-slate-400">
+                      <th className="py-2 text-left">{t.advanceAmount}</th>
+                      <th className="py-2 text-right">{t.advanceNote}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monthAdvances.map(adv => (
+                      <tr key={adv.id} className="border-b border-slate-100">
+                        <td className="py-2 font-black text-red-600">{adv.amount} zł</td>
+                        <td className="py-2 text-right font-medium text-slate-600 max-w-[160px] truncate">
+                          {adv.note || "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
