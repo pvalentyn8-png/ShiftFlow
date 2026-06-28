@@ -34,16 +34,16 @@ import {
 } from "lucide-react";
 
 const HOURS_IN_DAY = 24;
-const APP_VERSION = "4.1";
+const APP_VERSION = "4.3";
 
 const T = {
   ua: {
     appTitle: "Трекер Змін",
     version: "Версія",
-    onboardingTitle: "Версія v4.1! 🏆",
-    onboarding1: "Конвертація Валют: Додано кнопку перемикання валюти (zł / €) у шапці з автоматичним перерахунком ставок, авансів та профілів за курсом 1 € = 4.30 zł.",
-    onboarding2: "Журнал змін: Прямо під версією у футері тепер можна переглянути повну історію останніх оновлень.",
-    onboarding3: "Захист календаря: Натисніть на замок 🔒 у верхній панелі для захисту від випадкових натискань.",
+    onboardingTitle: "Версія v4.3! 🏆",
+    onboarding1: "Гнучкий планувальник: Торкніться будь-якої картки статистики (зміни, години, заробіток) для відкриття інтерактивного калькулятора, що розраховує пропорції на льоту.",
+    onboarding2: "Швидка зміна мови: Додано кнопку 🌐 безпосередньо у верхню панель біля блокування календаря для миттєвої зміни мови в один дотик.",
+    onboarding3: "Журнал змін: Прямо під версією у футері тепер можна переглянути повну історію останніх оновлень.",
     onboarding4: "Пам'ять Профілів: Кожен водій має незалежні розрахунки, аванси та історію.",
     onboarding5: "PWA Додаток: Встановіть на робочий стіл Android/iOS для автономного доступу.",
     gotIt: "Зрозумів",
@@ -138,12 +138,29 @@ const T = {
     calendarLockedToast: "🔒 Календар заблоковано! Натисніть на замок 🔓 вгорі, щоб редагувати.",
     changelog: "Журнал змін",
     changelogTitle: "Історія оновлень",
+    plannerTitle: "Гнучкий планувальник доходів",
+    plannerSub: "Заплануйте свій графік та доходи на основі показників за цей місяць",
+    byShifts: "За змінами",
+    byHours: "За годинами",
+    byEarned: "За заробітком",
+    plannedShifts: "Плановані зміни",
+    plannedHours: "Плановані години",
+    targetEarnings: "Цільовий заробіток",
+    baseStatsLabel: "Показники за 1 зміну:",
+    avgShiftDuration: "середня тривалість",
+    avgShiftEarned: "середній заробіток",
+    shiftsNeeded: "Необхідно змін",
+    hoursNeeded: "Необхідно годин",
+    estimatedEarned: "Очікуваний заробіток",
+    hoursShort: "год",
+    shiftsShort: "змін",
+    clickToPlanHint: "💡 Натисніть на будь-яку картку, щоб розрахувати свій заробіток",
   },
   pl: {
     appTitle: "Tracker Zmian",
     version: "Wersja",
-    onboardingTitle: "Wersja v4.1! 🏆",
-    onboarding1: "Konwersja Walut: Dodano przycisk przełączania waluty (zł / €) w nagłówku z automatycznym przeliczaniem stawek, zaliczek i profili według kursu 1 € = 4.30 zł.",
+    onboardingTitle: "Wersja v4.2! 🏆",
+    onboarding1: "Szybka zmiana języka: Dodano przycisk 🌐 bezpośrednio w górnym panelu obok blokady kalendarza do błyskawicznej zmiany języka jednym dotknięciem.",
     onboarding2: "Dziennik zmian: Bezpośrednio pod wersją w stopce można teraz zobaczyć pełną historię ostatnich aktualizacji.",
     onboarding3: "Ochrona kalendarza: Kliknij kłódkę 🔒 u góry, aby chronić przed przypadkowymi zmianami.",
     onboarding4: "Pamięć Profilów: Każdy kierowca posiada oddzielne rozliczenia, zaliczki i historię.",
@@ -240,11 +257,38 @@ const T = {
     calendarLockedToast: "🔒 Kalendarz zablokowany! Kliknij kłódkę 🔓 u góry, aby edytować.",
     changelog: "Rejestr zmian",
     changelogTitle: "Historia aktualizacji",
+    plannerTitle: "Elastyczny planista dochodów",
+    plannerSub: "Zaplanuj swój grafik i dochody na podstawie wskaźników z tego miesiąca",
+    byShifts: "Według zmian",
+    byHours: "Według godzin",
+    byEarned: "Według zarobków",
+    plannedShifts: "Planowane zmiany",
+    plannedHours: "Planowane godziny",
+    targetEarnings: "Docelowy zarobek",
+    baseStatsLabel: "Wskaźniki za 1 zmianę:",
+    avgShiftDuration: "średni czas",
+    avgShiftEarned: "średni zarobek",
+    shiftsNeeded: "Wymagane zmiany",
+    hoursNeeded: "Wymagane godziny",
+    estimatedEarned: "Szacowany zarobek",
+    hoursShort: "godz",
+    shiftsShort: "zmian",
+    clickToPlanHint: "💡 Kliknij dowolną kartę, aby obliczyć swoje zarobki",
   }
 };
 
 const CHANGELOG_DATA = {
   ua: [
+    {
+      version: "v4.2",
+      date: "28.06.2026",
+      changes: [
+        "Швидке перемикання мови: Додано іконку Globe 🌐 у верхню панель біля блокування календаря для миттєвої зміни мови (UA/PL).",
+        "Новий інтерфейс меню дій: Оновлено іконку налаштувань на Chevron 🔽, що вказує на розгортання меню, з анімацією обертання.",
+        "Очищення шапки: Видалено дублюючу кнопку бекапу з верхньої панелі (вона доступна в меню дій), звільнивши простір.",
+        "Повна синхронізація версії: Оновлено версію в системних файлах та package.json до 4.2.0."
+      ]
+    },
     {
       version: "v4.1",
       date: "28.06.2026",
@@ -275,6 +319,16 @@ const CHANGELOG_DATA = {
     }
   ],
   pl: [
+    {
+      version: "v4.2",
+      date: "28.06.2026",
+      changes: [
+        "Szybka zmiana języka: Dodano ikonę Globe 🌐 w górnym panelu obok blokady kalendarza do błyskawicznej zmiany języka (UA/PL).",
+        "Nowy interfejs menu akcji: Zmieniono ikonę ustawień na Chevron 🔽, wskazujący na rozwijanie menu, z animacją obrotu.",
+        "Uporządkowanie nagłówka: Usunięto powtarzający się przycisk kopii zapasowej z górnego panelu (jest dostępny w menu akcji), uwalniając przestrzeń.",
+        "Pełna synchronizacja wersji: Zaktualizowano wersję w plikach systemowych oraz package.json do 4.2.0."
+      ]
+    },
     {
       version: "v4.1",
       date: "28.06.2026",
@@ -528,7 +582,7 @@ export default function ShiftTracker() {
       }
     } catch (e) {}
     
-    return "pl"; // Default
+    return "ua"; // Default
   });
   const [currency, setCurrency] = useState<"zł" | "€">(() => {
     const dedicated = localStorage.getItem("shift_tracker_preferred_currency");
@@ -666,6 +720,13 @@ export default function ShiftTracker() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  // Flexible Planner States
+  const [showPlanner, setShowPlanner] = useState(false);
+  const [plannerTab, setPlannerTab] = useState<"shifts" | "hours" | "earned">("shifts");
+  const [pShifts, setPShifts] = useState(10);
+  const [pHours, setPHours] = useState(240);
+  const [pEarned, setPEarned] = useState(3800);
   const [activeRest, setActiveRest] = useState<ActiveRest | null>(null);
   const [lastRestType, setLastRestType] = useState<24 | 45 | null>(null);
   const [now, setNow] = useState(Date.now());
@@ -1488,6 +1549,52 @@ export default function ShiftTracker() {
 
   const toReceive = monthTotalEarned - totalAdvances;
 
+  // Base stats for the planner
+  const plannerBaseStats = useMemo(() => {
+    const shiftsCount = currentMonthShifts.length;
+    const avgHours = shiftsCount > 0 ? (totalHours / shiftsCount) : 24;
+    const avgEarned = shiftsCount > 0 ? (monthTotalEarned / shiftsCount) : (24 * hourRate);
+    return {
+      avgHours: Math.round(avgHours * 10) / 10,
+      avgEarned: Math.round(avgEarned)
+    };
+  }, [currentMonthShifts.length, totalHours, monthTotalEarned, hourRate]);
+
+  const openPlanner = (tab: "shifts" | "hours" | "earned") => {
+    setPlannerTab(tab);
+    
+    // Compute starting values
+    const currentShifts = currentMonthShifts.length || 10;
+    const currentHours = totalHours || Math.round(currentShifts * plannerBaseStats.avgHours);
+    const currentEarned = Math.round(monthTotalEarned) || Math.round(currentShifts * plannerBaseStats.avgEarned);
+
+    setPShifts(currentShifts);
+    setPHours(currentHours);
+    setPEarned(currentEarned);
+    setShowPlanner(true);
+  };
+
+  const handlePlannerShiftsChange = (val: number) => {
+    const cleanVal = Math.max(0, val);
+    setPShifts(cleanVal);
+    setPHours(Math.round(cleanVal * plannerBaseStats.avgHours * 10) / 10);
+    setPEarned(Math.round(cleanVal * plannerBaseStats.avgEarned));
+  };
+
+  const handlePlannerHoursChange = (val: number) => {
+    const cleanVal = Math.max(0, val);
+    setPHours(cleanVal);
+    setPShifts(plannerBaseStats.avgHours > 0 ? Math.round((cleanVal / plannerBaseStats.avgHours) * 10) / 10 : 0);
+    setPEarned(Math.round(cleanVal * hourRate));
+  };
+
+  const handlePlannerEarnedChange = (val: number) => {
+    const cleanVal = Math.max(0, val);
+    setPEarned(cleanVal);
+    setPHours(hourRate > 0 ? Math.round((cleanVal / hourRate) * 10) / 10 : 0);
+    setPShifts(plannerBaseStats.avgEarned > 0 ? Math.round((cleanVal / plannerBaseStats.avgEarned) * 10) / 10 : 0);
+  };
+
   const prevMonth = () => {
     if (currentMonth === 0) {
       setCurrentMonth(11);
@@ -1980,17 +2087,33 @@ export default function ShiftTracker() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-3">
             {[
-              { label: t.shifts, value: currentMonthShifts.length, icon: CheckCircle2, color: theme.accentText },
-              { label: t.hours, value: totalHours, icon: Clock, color: "text-current opacity-70" },
-              { label: t.earned, value: `${Math.round(monthTotalEarned)} ${currency}`, icon: Wallet, color: "text-current font-black" }
+              { type: "shifts" as const, label: t.shifts, value: currentMonthShifts.length, icon: CheckCircle2, color: theme.accentText },
+              { type: "hours" as const, label: t.hours, value: totalHours, icon: Clock, color: "text-current opacity-70" },
+              { type: "earned" as const, label: t.earned, value: `${Math.round(monthTotalEarned)} ${currency}`, icon: Wallet, color: "text-current font-black" }
             ].map((item) => (
-              <div key={item.label} className={`${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border ${theme.border} rounded-2xl p-3 text-center transition-colors`}>
-                <div className={`text-lg font-black mb-1 ${item.color}`}>{item.value}</div>
-                <div className={`text-[9px] ${theme.textMuted} font-bold uppercase tracking-tight`}>{item.label}</div>
-              </div>
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => openPlanner(item.type)}
+                className={`group ${themeName === 'light' ? 'bg-slate-100 hover:bg-slate-200/80' : 'bg-white/5 hover:bg-white/10'} border ${theme.border} rounded-2xl p-2 sm:p-3 text-center transition-all duration-300 active:scale-95 hover:scale-[1.02] cursor-pointer relative overflow-hidden`}
+              >
+                <div className={`text-sm xs:text-base sm:text-lg font-black mb-1 ${item.color} flex items-center justify-center gap-1 whitespace-nowrap`}>
+                  {item.value}
+                </div>
+                <div className={`text-[8px] sm:text-[9px] ${theme.textMuted} group-hover:${theme.accentText} font-bold uppercase tracking-tight flex items-center justify-center gap-1 transition-colors`}>
+                  <item.icon size={10} className="opacity-60 shrink-0" />
+                  <span className="truncate">{item.label}</span>
+                </div>
+                {/* Visual indicator of interactivity */}
+                <div className={`absolute top-1 right-1 w-1 h-1 rounded-full bg-${theme.accent}/40 opacity-0 group-hover:opacity-100 transition-opacity`} />
+              </button>
             ))}
+          </div>
+
+          <div className={`text-[9px] ${theme.textMuted} text-center mb-6 uppercase tracking-wider font-bold`}>
+            {t.clickToPlanHint}
           </div>
 
           {/* Financial Breakdown */}
@@ -2626,6 +2749,335 @@ export default function ShiftTracker() {
                   {t.gotIt}
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+
+
+      {/* FLEXIBLE INCOME PLANNER MODAL */}
+      <AnimatePresence>
+        {showPlanner && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPlanner(false)}
+              className="absolute inset-0 bg-black/85 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, y: 30, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 30, opacity: 0 }}
+              className={`relative w-full max-w-md max-h-[92vh] overflow-y-auto ${themeName === 'light' ? 'bg-white' : 'bg-[#121225]'} border ${theme.border} rounded-[28px] sm:rounded-[32px] p-4 sm:p-6 shadow-2xl text-current scrollbar-none`}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <div className="flex items-center gap-2">
+                  <div className={`p-1.5 sm:p-2 bg-${theme.accent}/10 rounded-xl ${theme.accentText}`}>
+                    <RefreshCw size={16} className="animate-spin-slow" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-black tracking-tight leading-none">{(t as any).plannerTitle}</h3>
+                    <p className={`text-[8px] sm:text-[9px] ${theme.textMuted} font-semibold uppercase mt-0.5 tracking-wide`}>{(t as any).plannerSub}</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowPlanner(false)} 
+                  className={`p-1.5 sm:p-2 rounded-full ${themeName === 'light' ? 'bg-slate-100 hover:bg-slate-200' : 'bg-white/5 hover:bg-white/10'} text-current transition-colors`}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+
+              {/* Baseline stats indicator */}
+              <div className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl ${themeName === 'light' ? 'bg-slate-50' : 'bg-white/[0.02]'} border ${theme.border} mb-4 sm:mb-6 text-center text-xs flex items-center justify-center gap-1.5`}>
+                <Info size={12} className={`shrink-0 ${theme.accentText}`} />
+                <span className={`text-[8px] sm:text-[10px] font-bold ${theme.textMuted} uppercase tracking-wide`}>
+                  {(t as any).baseStatsLabel} 1 {(t as any).shiftsShort} = {plannerBaseStats.avgHours} {(t as any).hoursShort} ≈ {plannerBaseStats.avgEarned} {currency}
+                </span>
+              </div>
+
+              {/* Tabs Switcher */}
+              <div className={`flex p-1 ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border ${theme.border} rounded-xl sm:rounded-2xl gap-1 mb-4 sm:mb-6`}>
+                {[
+                  { id: "shifts" as const, label: (t as any).byShifts, icon: CheckCircle2 },
+                  { id: "hours" as const, label: (t as any).byHours, icon: Clock },
+                  { id: "earned" as const, label: (t as any).byEarned, icon: Wallet }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setPlannerTab(tab.id)}
+                    className={`flex-1 py-1.5 sm:py-2.5 flex flex-col items-center justify-center gap-1 sm:gap-1.5 rounded-lg sm:rounded-xl text-[8px] sm:text-[10px] font-black uppercase tracking-wider transition-all duration-300 ${
+                      plannerTab === tab.id
+                      ? `bg-${theme.accent} text-white shadow-lg shadow-${theme.accent}/20`
+                      : `${theme.textMuted} hover:text-current`
+                    }`}
+                  >
+                    <tab.icon size={12} />
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Active Planner Tab Interactive Inputs & Sliders */}
+              <div className="mb-5 sm:mb-8">
+                {plannerTab === "shifts" && (
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="text-center">
+                      <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${theme.textMuted}`}>
+                        {(t as any).plannedShifts}
+                      </span>
+                      <div className="flex items-center justify-center gap-2 sm:gap-4 mt-1 sm:mt-2">
+                        <button
+                          type="button"
+                          onClick={() => handlePlannerShiftsChange(pShifts - 1)}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border ${theme.border} ${themeName === 'light' ? 'bg-slate-50 hover:bg-slate-100' : 'bg-white/5 hover:bg-white/10'} text-base sm:text-lg font-black flex items-center justify-center active:scale-95 transition-all`}
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          value={pShifts === 0 ? "" : pShifts}
+                          onChange={(e) => handlePlannerShiftsChange(Number(e.target.value))}
+                          placeholder="0"
+                          className={`w-20 sm:w-28 text-center text-2xl sm:text-4xl font-black focus:outline-none bg-transparent ${theme.accentText}`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handlePlannerShiftsChange(pShifts + 1)}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border ${theme.border} ${themeName === 'light' ? 'bg-slate-50 hover:bg-slate-100' : 'bg-white/5 hover:bg-white/10'} text-base sm:text-lg font-black flex items-center justify-center active:scale-95 transition-all`}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <div className="flex justify-center gap-1.5 mt-1.5">
+                        {[-5, +5].map(val => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => handlePlannerShiftsChange(pShifts + val)}
+                            className={`px-2.5 py-0.5 sm:px-3 sm:py-1 text-[8px] sm:text-[9px] font-black uppercase rounded-lg border ${theme.border} ${themeName === 'light' ? 'bg-slate-50 hover:bg-slate-100' : 'bg-white/5 hover:bg-white/10'} opacity-75 hover:opacity-100 transition-opacity`}
+                          >
+                            {val > 0 ? `+${val}` : val}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="60"
+                        step="1"
+                        value={pShifts}
+                        onChange={(e) => handlePlannerShiftsChange(Number(e.target.value))}
+                        className={`w-full h-1 rounded-lg appearance-none cursor-pointer bg-slate-200 dark:bg-white/10`}
+                        style={{ accentColor: themeName === 'light' ? '#3b82f6' : undefined }}
+                      />
+                      <div className={`flex justify-between text-[8px] sm:text-[9px] font-bold ${theme.textMuted} uppercase tracking-wider mt-1`}>
+                        <span>0 {(t as any).shiftsShort}</span>
+                        <span>30 {(t as any).shiftsShort}</span>
+                        <span>60 {(t as any).shiftsShort}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {plannerTab === "hours" && (
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="text-center">
+                      <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${theme.textMuted}`}>
+                        {(t as any).plannedHours}
+                      </span>
+                      <div className="flex items-center justify-center gap-2 sm:gap-4 mt-1 sm:mt-2">
+                        <button
+                          type="button"
+                          onClick={() => handlePlannerHoursChange(pHours - 8)}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border ${theme.border} ${themeName === 'light' ? 'bg-slate-50 hover:bg-slate-100' : 'bg-white/5 hover:bg-white/10'} text-base sm:text-lg font-black flex items-center justify-center active:scale-95 transition-all`}
+                        >
+                          −
+                        </button>
+                        <input
+                          type="number"
+                          value={pHours === 0 ? "" : pHours}
+                          onChange={(e) => handlePlannerHoursChange(Number(e.target.value))}
+                          placeholder="0"
+                          className="w-24 sm:w-32 text-center text-2xl sm:text-4xl font-black focus:outline-none bg-transparent text-current"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handlePlannerHoursChange(pHours + 8)}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border ${theme.border} ${themeName === 'light' ? 'bg-slate-50 hover:bg-slate-100' : 'bg-white/5 hover:bg-white/10'} text-base sm:text-lg font-black flex items-center justify-center active:scale-95 transition-all`}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <div className="flex justify-center gap-1.5 mt-1.5">
+                        {[-24, +24].map(val => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => handlePlannerHoursChange(pHours + val)}
+                            className={`px-2.5 py-0.5 sm:px-3 sm:py-1 text-[8px] sm:text-[9px] font-black uppercase rounded-lg border ${theme.border} ${themeName === 'light' ? 'bg-slate-50 hover:bg-slate-100' : 'bg-white/5 hover:bg-white/10'} opacity-75 hover:opacity-100 transition-opacity`}
+                          >
+                            {val > 0 ? `+${val}` : val}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="720"
+                        step="4"
+                        value={pHours}
+                        onChange={(e) => handlePlannerHoursChange(Number(e.target.value))}
+                        className="w-full h-1 rounded-lg appearance-none cursor-pointer bg-slate-200 dark:bg-white/10"
+                        style={{ accentColor: themeName === 'light' ? '#3b82f6' : undefined }}
+                      />
+                      <div className={`flex justify-between text-[8px] sm:text-[9px] font-bold ${theme.textMuted} uppercase tracking-wider mt-1`}>
+                        <span>0 {(t as any).hoursShort}</span>
+                        <span>360 {(t as any).hoursShort}</span>
+                        <span>720 {(t as any).hoursShort}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {plannerTab === "earned" && (
+                  <div className="space-y-4 sm:space-y-6">
+                    <div className="text-center">
+                      <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${theme.textMuted}`}>
+                        {(t as any).targetEarnings}
+                      </span>
+                      <div className="flex items-center justify-center gap-2 sm:gap-4 mt-1 sm:mt-2">
+                        <button
+                          type="button"
+                          onClick={() => handlePlannerEarnedChange(pEarned - 100)}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border ${theme.border} ${themeName === 'light' ? 'bg-slate-50 hover:bg-slate-100' : 'bg-white/5 hover:bg-white/10'} text-base sm:text-lg font-black flex items-center justify-center active:scale-95 transition-all`}
+                        >
+                          −
+                        </button>
+                        <div className="flex items-baseline justify-center font-black text-2xl sm:text-4xl">
+                          <input
+                            type="number"
+                            value={pEarned === 0 ? "" : pEarned}
+                            onChange={(e) => handlePlannerEarnedChange(Number(e.target.value))}
+                            placeholder="0"
+                            className="w-28 sm:w-36 text-center focus:outline-none bg-transparent text-green-500"
+                          />
+                          <span className="text-base sm:text-lg text-green-500 ml-0.5">{currency}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handlePlannerEarnedChange(pEarned + 100)}
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border ${theme.border} ${themeName === 'light' ? 'bg-slate-50 hover:bg-slate-100' : 'bg-white/5 hover:bg-white/10'} text-base sm:text-lg font-black flex items-center justify-center active:scale-95 transition-all`}
+                        >
+                          +
+                        </button>
+                      </div>
+                      <div className="flex justify-center gap-1.5 mt-1.5">
+                        {[-1000, +1000].map(val => (
+                          <button
+                            key={val}
+                            type="button"
+                            onClick={() => handlePlannerEarnedChange(pEarned + val)}
+                            className={`px-2.5 py-0.5 sm:px-3 sm:py-1 text-[8px] sm:text-[9px] font-black uppercase rounded-lg border ${theme.border} ${themeName === 'light' ? 'bg-slate-50 hover:bg-slate-100' : 'bg-white/5 hover:bg-white/10'} opacity-75 hover:opacity-100 transition-opacity`}
+                          >
+                            {val > 0 ? `+${val}` : val}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="25000"
+                        step="250"
+                        value={pEarned}
+                        onChange={(e) => handlePlannerEarnedChange(Number(e.target.value))}
+                        className="w-full h-1 rounded-lg appearance-none cursor-pointer bg-slate-200 dark:bg-white/10"
+                        style={{ accentColor: themeName === 'light' ? '#3b82f6' : undefined }}
+                      />
+                      <div className={`flex justify-between text-[8px] sm:text-[9px] font-bold ${theme.textMuted} uppercase tracking-wider mt-1`}>
+                        <span>0 {currency}</span>
+                        <span>12.5k {currency}</span>
+                        <span>25k {currency}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* RESULTS PANEL */}
+              <div className={`${themeName === 'light' ? 'bg-slate-50' : 'bg-black/35'} border ${theme.border} rounded-2xl p-3 sm:p-5 mb-4 sm:mb-6`}>
+                <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                  {plannerTab !== "shifts" && (
+                    <div className="text-center p-2 sm:p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                      <span className={`text-[7px] sm:text-[8px] font-bold uppercase ${theme.textMuted} tracking-widest block mb-0.5`}>{(t as any).shiftsNeeded}</span>
+                      <span className={`text-base sm:text-xl font-black ${theme.accentText}`}>{pShifts}</span>
+                      <span className={`text-[8px] sm:text-[9px] ${theme.textMuted} ml-1 font-bold`}>{(t as any).shiftsShort}</span>
+                    </div>
+                  )}
+
+                  {plannerTab !== "hours" && (
+                    <div className="text-center p-2 sm:p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                      <span className={`text-[7px] sm:text-[8px] font-bold uppercase ${theme.textMuted} tracking-widest block mb-0.5`}>{(t as any).hoursNeeded}</span>
+                      <span className="text-base sm:text-xl font-black text-current">{pHours}</span>
+                      <span className={`text-[8px] sm:text-[9px] ${theme.textMuted} ml-1 font-bold`}>{(t as any).hoursShort}</span>
+                    </div>
+                  )}
+
+                  {plannerTab !== "earned" && (
+                    <div className="text-center p-2 sm:p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] col-span-1">
+                      <span className={`text-[7px] sm:text-[8px] font-bold uppercase ${theme.textMuted} tracking-widest block mb-0.5`}>{(t as any).estimatedEarned}</span>
+                      <span className="text-base sm:text-xl font-black text-green-500">{pEarned}</span>
+                      <span className="text-[9px] sm:text-[10px] text-green-500 ml-1 font-black">{currency}</span>
+                    </div>
+                  )}
+                  
+                  {plannerTab === "shifts" && (
+                    <div className="text-center p-2 sm:p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                      <span className={`text-[7px] sm:text-[8px] font-bold uppercase ${theme.textMuted} tracking-widest block mb-0.5`}>{(t as any).hoursNeeded}</span>
+                      <span className="text-base sm:text-xl font-black text-current">{pHours}</span>
+                      <span className={`text-[8px] sm:text-[9px] ${theme.textMuted} ml-1 font-bold`}>{(t as any).hoursShort}</span>
+                    </div>
+                  )}
+                  {plannerTab === "hours" && (
+                    <div className="text-center p-2 sm:p-3 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                      <span className={`text-[7px] sm:text-[8px] font-bold uppercase ${theme.textMuted} tracking-widest block mb-0.5`}>{(t as any).shiftsNeeded}</span>
+                      <span className={`text-base sm:text-xl font-black ${theme.accentText}`}>{pShifts}</span>
+                      <span className={`text-[8px] sm:text-[9px] ${theme.textMuted} ml-1 font-bold`}>{(t as any).shiftsShort}</span>
+                    </div>
+                  )}
+                  {plannerTab === "earned" && (
+                    <div className="text-center p-2 sm:p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] col-span-2 mt-1">
+                      <span className={`text-[7px] sm:text-[8px] font-bold uppercase ${theme.textMuted} tracking-widest block mb-0.5`}>
+                        ⚖️ Пропорція розрахунку
+                      </span>
+                      <p className={`text-[9px] sm:text-[10px] ${theme.textMuted} font-semibold leading-relaxed uppercase`}>
+                        Для заробітку <span className="font-black text-green-500">{pEarned} {currency}</span> потрібно відпрацювати <span className={`font-black ${theme.accentText}`}>{pShifts}</span> змін або <span className="font-black text-current">{pHours}</span> годин.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowPlanner(false)}
+                className={`w-full py-3 sm:py-4 bg-${theme.accent} hover:opacity-90 rounded-xl sm:rounded-2xl text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg shadow-${theme.accent}/20 active:scale-95 transition-all`}
+              >
+                {t.yesAdd}
+              </button>
             </motion.div>
           </div>
         )}
