@@ -28,7 +28,9 @@ import {
   Upload,
   MoreHorizontal,
   Lock,
-  Unlock
+  Unlock,
+  Settings,
+  ChevronDown
 } from "lucide-react";
 
 const HOURS_IN_DAY = 24;
@@ -406,6 +408,63 @@ const THEMES: Record<ThemeName, ThemeColors> = {
   }
 };
 
+// Tailwind compiler safelist for dynamic template classes to ensure they are generated at build time
+const _tailwindSafelist = [
+  // Backgrounds (accent)
+  "bg-purple-600",
+  "bg-sky-600",
+  "bg-emerald-600",
+  "bg-orange-600",
+  // Backgrounds (secondary)
+  "bg-amber-500",
+  "bg-emerald-500",
+  "bg-lime-500",
+  "bg-rose-500",
+  "bg-amber-600",
+  // Border colors (accent)
+  "border-purple-600",
+  "border-sky-600",
+  "border-emerald-600",
+  "border-orange-600",
+  "focus:border-purple-600",
+  "focus:border-sky-600",
+  "focus:border-emerald-600",
+  "focus:border-orange-600",
+  // Border colors (secondary)
+  "border-amber-500",
+  "border-emerald-500",
+  "border-lime-500",
+  "border-rose-500",
+  "border-amber-600",
+  // Text colors (secondary)
+  "text-amber-500",
+  "text-emerald-500",
+  "text-lime-500",
+  "text-rose-500",
+  "text-amber-600",
+  "text-purple-600",
+  "text-sky-600",
+  "text-emerald-600",
+  "text-orange-600",
+  "focus:ring-purple-600/40",
+  "focus:ring-sky-600/40",
+  "focus:ring-emerald-600/40",
+  "focus:ring-orange-600/40",
+  "focus:ring-amber-500/40",
+  "focus:ring-emerald-500/40",
+  "focus:ring-lime-500/40",
+  "focus:ring-rose-500/40",
+  "focus:ring-amber-600/40",
+  "bg-amber-500/10",
+  "bg-emerald-500/10",
+  "bg-lime-500/10",
+  "bg-rose-500/10",
+  "bg-purple-500/10",
+  "bg-purple-500/25",
+  "bg-rose-500/25",
+  "bg-emerald-500/25"
+];
+
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
 }
@@ -624,6 +683,7 @@ export default function ShiftTracker() {
     }
   });
 
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showActionsMenu, setShowActionsMenu] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -1323,6 +1383,10 @@ export default function ShiftTracker() {
   const totalAdvances = monthAdvances.reduce((s, a) => s + a.amount, 0);
 
   const openAddAdvance = () => {
+    if (isLocked) {
+      setShowLockToast(true);
+      return;
+    }
     setAdvanceAmount("");
     setAdvanceNote("");
     setEditAdvanceId(null);
@@ -1331,6 +1395,10 @@ export default function ShiftTracker() {
   };
 
   const openEditAdvance = (id: number) => {
+    if (isLocked) {
+      setShowLockToast(true);
+      return;
+    }
     const adv = monthAdvances.find(a => a.id === id);
     if (!adv) return;
     setAdvanceAmount(String(adv.amount));
@@ -1344,6 +1412,7 @@ export default function ShiftTracker() {
   const advanceDidLongPress = useRef(false);
 
   const handleAdvancePointerDown = (id: number) => {
+    if (isLocked) return;
     advanceDidLongPress.current = false;
     advancePressTimer.current = setTimeout(() => {
       advanceDidLongPress.current = true;
@@ -1503,6 +1572,7 @@ export default function ShiftTracker() {
           {pullProgress >= pullThreshold && !isRefreshing && <span className="text-[8px] font-black uppercase pr-1">Release</span>}
         </motion.div>
       </div>
+
       {/* Update Layer */}
       <AnimatePresence>
         {isUpdating && (
@@ -1522,6 +1592,7 @@ export default function ShiftTracker() {
           </motion.div>
         )}
       </AnimatePresence>
+
       {/* Background Decor */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none print:hidden">
         <div className={`absolute top-[-10%] right-[-10%] w-[50%] h-[50%] ${themeName === 'light' ? 'bg-purple-200/40' : 'bg-purple-900/20'} rounded-full blur-[120px]`} />
@@ -1561,14 +1632,174 @@ export default function ShiftTracker() {
         
         {/* Header */}
         <header className="flex items-start justify-between mb-8">
-          <div>
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`text-[10px] tracking-[0.4em] ${theme.accentText} uppercase font-bold mb-1`}
-            >
-              {t.appTitle}
-            </motion.div>
+          <div className="w-full">
+            <div className="flex items-center justify-between mb-1">
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`text-[10px] tracking-[0.4em] ${theme.accentText} uppercase font-bold`}
+              >
+                {t.appTitle}
+              </motion.div>
+              
+              {/* Settings Menu Button Group */}
+              <div className="relative flex items-center gap-1.5">
+                {/* Lock Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsLocked(!isLocked)}
+                  className={`w-7 h-7 flex items-center justify-center border rounded-lg transition-all duration-300 hover:scale-[1.05] active:scale-95 ${
+                    isLocked
+                      ? 'bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500/25'
+                      : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/25'
+                  }`}
+                  title={isLocked ? (lang === 'ua' ? "Календар заблоковано. Натисніть, щоб дозволити зміни" : "Kalendarz zablokowany. Kliknij, aby zezwolić na zmiany") : (lang === 'ua' ? "Блокування змін календаря" : "Zablokuj kalendarz перед змінами")}
+                >
+                  {isLocked ? <Lock size={12} className="opacity-85" /> : <Unlock size={12} className="opacity-85" />}
+                </button>
+
+                {/* Language Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => setLang(l => l === "ua" ? "pl" : "ua")}
+                  className={`w-7 h-7 flex items-center justify-center ${themeName === 'light' ? 'bg-black/5 hover:bg-black/10' : 'bg-white/5 hover:bg-white/10'} border ${theme.border} rounded-lg ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
+                  title={lang === "ua" ? "Змінити мову (UA/PL)" : "Zmień język (UA/PL)"}
+                >
+                  <Globe size={12} className="opacity-80" />
+                </button>
+
+                {/* Theme Toggle Button */}
+                <button
+                  type="button"
+                  onClick={nextTheme}
+                  className={`w-7 h-7 flex items-center justify-center ${themeName === 'light' ? 'bg-black/5 hover:bg-black/10' : 'bg-white/5 hover:bg-white/10'} border ${theme.border} rounded-lg ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
+                  title={lang === "ua" ? "Змінити тему оформлення" : "Zmień motyw"}
+                >
+                  <span className="text-xs select-none">
+                    {themeName === 'light' ? '☀️' : themeName === 'deep-night' ? '🌌' : themeName === 'midnight' ? '🌊' : themeName === 'forest' ? '🌲' : '🌇'}
+                  </span>
+                </button>
+
+                {/* Settings Menu Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+                  className={`w-7 h-7 flex items-center justify-center ${themeName === 'light' ? 'bg-black/5 hover:bg-black/10' : 'bg-white/5 hover:bg-white/10'} border ${theme.border} rounded-lg ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
+                  title={lang === "ua" ? "Налаштування та Дії" : "Ustawienia i Akcje"}
+                >
+                  <ChevronDown size={12} className={`opacity-80 transition-transform duration-300 ${showSettingsMenu ? 'rotate-180' : ''}`} />
+                </button>
+
+                <AnimatePresence>
+                  {showSettingsMenu && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-[150]" 
+                        onClick={() => setShowSettingsMenu(false)}
+                      />
+                      
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        className={`absolute right-0 mt-2 w-64 rounded-3xl ${themeName === 'light' ? 'bg-white shadow-xl' : 'bg-[#1a1a2e]' } shadow-[0_10px_30px_rgba(0,0,0,0.5)] border ${theme.border} p-3.5 z-[160] overflow-hidden`}
+                      >
+                        {/* 1. PREFERENCES */}
+                        <div className="mb-3.5 space-y-1.5">
+                          <div className={`text-[9px] font-black uppercase tracking-wider ${theme.textMuted} mb-1.5`}>
+                            {lang === "ua" ? "Налаштування" : "Ustawienia"}
+                          </div>
+
+                          {/* Language Toggle */}
+                          <button
+                            type="button"
+                            onClick={() => setLang(l => l === "ua" ? "pl" : "ua")}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold ${themeName === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/5'} transition-all`}
+                          >
+                            <span className="flex items-center gap-2">
+                              <Globe size={13} className="opacity-80" />
+                              <span>{lang === "ua" ? "Мова:" : "Język:"}</span>
+                            </span>
+                            <span className={`text-[10px] font-black uppercase tracking-wider ${theme.accentText}`}>
+                              {lang === "ua" ? "Українська 🇺🇦" : "Polski 🇵🇱"}
+                            </span>
+                          </button>
+
+                        </div>
+
+                        {/* 2. ACTIONS / EXPORT */}
+                        <div className="pt-2 border-t border-white/5 space-y-1">
+                          <div className={`text-[9px] font-black uppercase tracking-wider ${theme.textMuted} mb-1.5`}>
+                            {lang === "ua" ? "Експорт та Імпорт" : "Eksport i Import"}
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowSettingsMenu(false);
+                              handleExportPdf();
+                            }}
+                            className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-left text-[11px] font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-emerald-500`}
+                          >
+                            <Save size={13} />
+                            <span>{t.exportPdf}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowSettingsMenu(false);
+                              handleExportCsv();
+                            }}
+                            className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-left text-[11px] font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-blue-500`}
+                          >
+                            <FileSpreadsheet size={13} />
+                            <span>{(t as any).exportCsv}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowSettingsMenu(false);
+                              handleExportBackupJson();
+                            }}
+                            className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-left text-[11px] font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-indigo-500`}
+                          >
+                            <Database size={13} />
+                            <span>{(t as any).backupJson}</span>
+                          </button>
+
+                          <div className="relative">
+                            <input 
+                              type="file"
+                              ref={fileInputRef}
+                              accept=".pdf,.json"
+                              multiple
+                              onChange={(e) => {
+                                setShowSettingsMenu(false);
+                                handleImportFiles(e);
+                              }}
+                              className="hidden"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                fileInputRef.current?.click();
+                              }}
+                              className={`w-full flex items-center gap-3 px-3 py-1.5 rounded-xl text-left text-[11px] font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-amber-500`}
+                            >
+                              <Upload size={13} />
+                              <span>{lang === "ua" ? "Імпорт PDF/JSON" : "Import PDF/JSON"}</span>
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+            
             <div className={`text-[8px] font-medium tracking-[0.2em] uppercase ${theme.textMuted} -mt-1 mb-2 opacity-50`}>
               Create by Valentyn
             </div>
@@ -1580,8 +1811,15 @@ export default function ShiftTracker() {
                 onBlur={() => { if (shiftRate === "" || shiftRate === 0) setShiftRate(380) }}
                 className={`w-20 bg-transparent border-b ${theme.border} focus:border-${theme.accent} focus:outline-none font-black text-3xl text-current transition-all`}
               />
-              <span className={`text-sm font-medium ${theme.textMuted}`}>{currency} / {t.perShift}</span>
-              <span className="text-[9px] opacity-20 font-bold ml-2">v{APP_VERSION}</span>
+              <button
+                type="button"
+                onClick={() => handleCurrencyChange(currency === "zł" ? "€" : "zł")}
+                className={`text-sm font-bold ${theme.accentText} flex items-center gap-1 px-2 py-0.5 rounded-lg border border-transparent hover:border-current/20 ${themeName === 'light' ? 'hover:bg-slate-100' : 'hover:bg-white/5'} transition-all duration-300 active:scale-95`}
+                title={lang === "ua" ? "Перемикнути валюту (zł / €)" : "Przełącz walutę (zł / €)"}
+              >
+                <span>{currency}</span>
+                <span className={`text-[10px] font-medium ${theme.textMuted}`}>/ {t.perShift}</span>
+              </button>
             </div>
             <motion.div 
               initial={{ opacity: 0 }}
@@ -1591,135 +1829,6 @@ export default function ShiftTracker() {
             >
               ≈ {hourRate.toFixed(2)} {currency} / {t.perHour}
             </motion.div>
-          </div>
-
-          <div className="flex gap-1.5 items-center shrink-0 select-none">
-            {/* Actions Menu */}
-            <div className="relative">
-              <button
-                onClick={() => setShowActionsMenu(!showActionsMenu)}
-                className={`w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center ${theme.accentMuted} border ${theme.border} rounded-xl text-xs font-bold ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
-                title={lang === "ua" ? "Дії / Експорт" : "Akcje / Eksport"}
-              >
-                <Download size={14} className="opacity-80" />
-              </button>
-
-              <AnimatePresence>
-                {showActionsMenu && (
-                  <>
-                    <div 
-                      className="fixed inset-0 z-[150]" 
-                      onClick={() => setShowActionsMenu(false)}
-                    />
-                    
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                      className={`absolute right-0 mt-2 w-56 rounded-2xl ${themeName === 'light' ? 'bg-white shadow-xl' : 'bg-[#1a1a2e]' } shadow-[0_10px_30px_rgba(0,0,0,0.5)] border ${theme.border} p-1.5 z-[160] overflow-hidden`}
-                    >
-                      <button
-                        onClick={() => {
-                          setShowActionsMenu(false);
-                          handleExportPdf();
-                        }}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-emerald-500`}
-                      >
-                        <Save size={14} />
-                        <span>{t.exportPdf}</span>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setShowActionsMenu(false);
-                          handleExportCsv();
-                        }}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-blue-500`}
-                      >
-                        <FileSpreadsheet size={14} />
-                        <span>{(t as any).exportCsv}</span>
-                      </button>
-
-                      <button
-                        onClick={() => {
-                          setShowActionsMenu(false);
-                          handleExportBackupJson();
-                        }}
-                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-indigo-500`}
-                      >
-                        <Database size={14} />
-                        <span>{(t as any).backupJson}</span>
-                      </button>
-
-                      <div className={`h-px ${themeName === 'light' ? 'bg-slate-200' : 'bg-white/10'} my-1`} />
-
-                      <div className="relative">
-                        <input 
-                          type="file"
-                          ref={fileInputRef}
-                          accept=".pdf,.json"
-                          multiple
-                          onChange={(e) => {
-                            setShowActionsMenu(false);
-                            handleImportFiles(e);
-                          }}
-                          className="hidden"
-                        />
-                        <button
-                          onClick={() => {
-                            fileInputRef.current?.click();
-                          }}
-                          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-xs font-black uppercase tracking-wider hover:${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} transition-all text-amber-500`}
-                        >
-                          <Upload size={14} />
-                          <span>{lang === "ua" ? "Імпорт PDF/JSON" : "Import PDF/JSON"}</span>
-                        </button>
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Calendar Protection Lock */}
-            <button
-              onClick={() => setIsLocked(!isLocked)}
-              className={`w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center border rounded-xl transition-all duration-300 hover:scale-[1.05] active:scale-95 ${
-                isLocked
-                  ? 'bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500/25'
-                  : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/25'
-              }`}
-              title={isLocked ? (lang === 'ua' ? "Календар заблоковано. Натисніть, щоб дозволити зміни" : "Kalendarz zablokowany. Kliknij, aby zezwolić na zmiany") : (lang === 'ua' ? "Блокування змін календаря" : "Zablokuj kalendarz przed zmianami")}
-            >
-              {isLocked ? <Lock size={14} className="opacity-85" /> : <Unlock size={14} className="opacity-85" />}
-            </button>
-
-            {/* Theme Selector */}
-            <button
-              onClick={nextTheme}
-              className={`w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center ${theme.accentMuted} border ${theme.border} rounded-xl text-sm ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
-              title={t.theme}
-            >
-              <span className="text-sm select-none">{themeName === 'light' ? '☀️' : themeName === 'deep-night' ? '🌌' : themeName === 'midnight' ? '🌊' : themeName === 'forest' ? '🌲' : '🌇'}</span>
-            </button>
-
-            {/* Language Selector */}
-            <button
-              onClick={() => setLang(l => l === "ua" ? "pl" : "ua")}
-              className={`w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center ${theme.accentMuted} border ${theme.border} rounded-xl text-xs font-black ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
-              title={lang === "ua" ? "Zmiana języka na Polski" : "Зміна мови на Українську"}
-            >
-              <Globe size={14} className="opacity-80" />
-            </button>
-
-            {/* Currency Selector */}
-            <button
-              onClick={() => handleCurrencyChange(currency === "zł" ? "€" : "zł")}
-              className={`w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center ${theme.accentMuted} border ${theme.border} rounded-xl text-xs font-black ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
-              title={lang === "ua" ? "Конвертувати та змінити валюту за курсом 1 € = 4.30 zł" : "Konwertuj i zmień walutę po kursie 1 € = 4.30 zł"}
-            >
-              <span className="text-xs font-black select-none tracking-tighter leading-none">{currency}</span>
-            </button>
           </div>
         </header>
 
@@ -2000,29 +2109,36 @@ export default function ShiftTracker() {
 
                           {/* Content Layer (Draggable) */}
                           <motion.div 
-                            drag="x"
+                            drag={isLocked ? false : "x"}
                             dragConstraints={{ left: -100, right: 0 }}
                             dragElastic={0.15}
                             onDragEnd={(_, info) => {
+                              if (isLocked) return;
                               if (info.offset.x < -80) {
-                                deleteAdvance(adv.id);
+                                setAdvanceToDelete(adv.id);
                               }
                             }}
                             onPointerDown={() => handleAdvancePointerDown(adv.id)}
                             onPointerUp={() => handleAdvancePointerUp(adv.id)}
                             onPointerLeave={handleAdvancePointerCancel}
                             onPointerCancel={handleAdvancePointerCancel}
-                            className={`relative z-10 flex items-center justify-between ${themeName === 'light' ? 'bg-white' : 'bg-[#1a1a2e]'} border ${theme.border} rounded-2xl p-4 cursor-grab active:cursor-grabbing transition-colors duration-300`}
+                            className={`relative z-10 flex items-center justify-between ${themeName === 'light' ? 'bg-white' : 'bg-[#1a1a2e]'} border ${theme.border} rounded-2xl p-4 ${isLocked ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'} transition-colors duration-300`}
                           >
                             <div className="flex-1 cursor-pointer">
                               <div className={`text-lg font-black text-${theme.secondary}`}>{adv.amount} {currency}</div>
                               {adv.note && <div className={`text-[10px] ${theme.textMuted} font-medium uppercase truncate mt-0.5`}>{adv.note}</div>}
                             </div>
                             
-                            <div className="flex items-center gap-2 opacity-20 group-hover:opacity-100 transition-opacity pointer-events-none">
-                              <ChevronLeft size={12} className="animate-pulse" />
-                              <span className="text-[10px] font-black uppercase tracking-tighter opacity-50">Swipe</span>
-                            </div>
+                            {isLocked ? (
+                              <div className="flex items-center gap-1 opacity-40">
+                                <Lock size={12} className={theme.textMuted} />
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2 opacity-20 group-hover:opacity-100 transition-opacity pointer-events-none">
+                                <ChevronLeft size={12} className="animate-pulse" />
+                                <span className="text-[10px] font-black uppercase tracking-tighter opacity-50">Swipe</span>
+                              </div>
+                            )}
                           </motion.div>
                         </motion.div>
                       ))}
@@ -2228,7 +2344,9 @@ export default function ShiftTracker() {
                 <div className="flex items-center justify-between mb-8">
                   <div>
                     <div className="text-2xl font-black text-current">{t.addAdvance}</div>
-                    <div className={`text-[10px] text-${theme.secondary} font-black tracking-widest uppercase mt-1`}>
+                    <div className={`text-[10px] ${
+                      themeName === 'light' ? 'text-amber-600' : themeName === 'deep-night' ? 'text-amber-500' : themeName === 'midnight' ? 'text-emerald-500' : themeName === 'forest' ? 'text-lime-500' : 'text-rose-500'
+                    } font-black tracking-widest uppercase mt-1`}>
                       {t.months[currentMonth]} {currentYear}
                     </div>
                   </div>
@@ -2237,47 +2355,86 @@ export default function ShiftTracker() {
                   </button>
                 </div>
 
-                <div className="mb-6">
-                  <label className={`block text-[10px] font-black text-${theme.secondary} opacity-60 uppercase tracking-widest mb-3`}>{t.advanceAmount}</label>
-                  <input
-                    type="number"
-                    value={advanceAmount}
-                    onChange={e => setAdvanceAmount(e.target.value)}
-                    placeholder="0"
-                    autoFocus
-                    className={`w-full ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border ${theme.border} rounded-2xl py-4 px-4 text-current font-black text-3xl focus:outline-none focus:ring-2 focus:ring-${theme.secondary}/40`}
-                  />
-                </div>
+                <form
+                  onSubmit={e => {
+                    e.preventDefault();
+                    if (advanceAmount && parseFloat(advanceAmount) > 0) {
+                      saveAdvance();
+                    }
+                  }}
+                >
+                  <div className="mb-6">
+                    <label className={`block text-[10px] font-black ${
+                      themeName === 'light' ? 'text-amber-600' : themeName === 'deep-night' ? 'text-amber-500' : themeName === 'midnight' ? 'text-emerald-500' : themeName === 'forest' ? 'text-lime-500' : 'text-rose-500'
+                    } opacity-60 uppercase tracking-widest mb-3`}>{t.advanceAmount}</label>
+                    <input
+                      type="number"
+                      value={advanceAmount}
+                      onChange={e => setAdvanceAmount(e.target.value)}
+                      placeholder="0"
+                      autoFocus
+                      className={`w-full ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border ${theme.border} rounded-2xl py-4 px-4 text-current font-black text-3xl focus:outline-none focus:ring-2 ${
+                        themeName === 'light' ? 'focus:ring-amber-600/40' : themeName === 'deep-night' ? 'focus:ring-amber-500/40' : themeName === 'midnight' ? 'focus:ring-emerald-500/40' : themeName === 'forest' ? 'focus:ring-lime-500/40' : 'focus:ring-rose-500/40'
+                      }`}
+                    />
+                    {/* Quick selection of standard amounts */}
+                    <div className="flex gap-1.5 mt-3 overflow-x-auto no-scrollbar py-1">
+                      {(currency === "€" ? [10, 20, 50, 100, 200] : [50, 100, 200, 500, 1000]).map(val => (
+                        <button
+                          key={val}
+                          type="button"
+                          onClick={() => setAdvanceAmount(String(val))}
+                          className={`px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-wider shrink-0 transition-all active:scale-95 ${
+                            advanceAmount === String(val)
+                              ? `${
+                                  themeName === 'light' ? 'bg-amber-600 text-white' : themeName === 'deep-night' ? 'bg-amber-500 text-black' : themeName === 'midnight' ? 'bg-emerald-500 text-black' : themeName === 'forest' ? 'bg-lime-500 text-black' : 'bg-rose-500 text-black'
+                                } border-transparent`
+                              : `${themeName === 'light' ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-white/5 hover:bg-white/10 text-white/70'} border-${theme.border}`
+                          }`}
+                        >
+                          {val} {currency}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-                <div className="mb-8">
-                  <label className={`block text-[10px] font-black text-${theme.secondary} opacity-60 uppercase tracking-widest mb-3`}>{t.advanceNote}</label>
-                  <input
-                    value={advanceNote}
-                    onChange={e => setAdvanceNote(e.target.value)}
-                    className={`w-full ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border ${theme.border} rounded-2xl py-4 px-4 text-current font-medium text-sm focus:outline-none focus:ring-2 focus:ring-${theme.secondary}/40`}
-                  />
-                </div>
+                  <div className="mb-6">
+                    <label className={`block text-[10px] font-black ${
+                      themeName === 'light' ? 'text-amber-600' : themeName === 'deep-night' ? 'text-amber-500' : themeName === 'midnight' ? 'text-emerald-500' : themeName === 'forest' ? 'text-lime-500' : 'text-rose-500'
+                    } opacity-60 uppercase tracking-widest mb-3`}>{t.advanceNote}</label>
+                    <input
+                      value={advanceNote}
+                      onChange={e => setAdvanceNote(e.target.value)}
+                      className={`w-full ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border ${theme.border} rounded-2xl py-4 px-4 text-current font-medium text-sm focus:outline-none focus:ring-2 ${
+                        themeName === 'light' ? 'focus:ring-amber-600/40' : themeName === 'deep-night' ? 'focus:ring-amber-500/40' : themeName === 'midnight' ? 'focus:ring-emerald-500/40' : themeName === 'forest' ? 'focus:ring-lime-500/40' : 'focus:ring-rose-500/40'
+                      }`}
+                    />
+                  </div>
 
-                <div className="flex flex-col gap-3">
-                  <button
-                    onClick={saveAdvance}
-                    disabled={!advanceAmount || parseFloat(advanceAmount) <= 0}
-                    className={`w-full py-4 ${
-                      !advanceAmount || parseFloat(advanceAmount) <= 0
-                        ? 'opacity-30 cursor-not-allowed'
-                        : 'hover:opacity-90 active:scale-[0.99]'
-                    } bg-${theme.secondary} rounded-2xl ${themeName === 'light' ? 'text-white' : 'text-black'} font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2`}
-                  >
-                    <CheckCircle2 size={18} />
-                    <span>OK</span>
-                  </button>
-                  <button
-                    onClick={() => setAdvanceModal(false)}
-                    className={`w-full py-2 ${theme.textMuted} text-xs font-bold uppercase tracking-widest hover:text-current transition-colors`}
-                  >
-                    {t.cancel}
-                  </button>
-                </div>
+                  <div className="flex flex-col gap-3">
+                    <button
+                      type="submit"
+                      disabled={!advanceAmount || parseFloat(advanceAmount) <= 0}
+                      className={`w-full py-4 ${
+                        !advanceAmount || parseFloat(advanceAmount) <= 0
+                          ? 'opacity-30 cursor-not-allowed'
+                          : 'hover:opacity-90 active:scale-[0.99]'
+                      } ${
+                        themeName === 'light' ? 'bg-amber-600 text-white' : themeName === 'deep-night' ? 'bg-amber-500 text-black' : themeName === 'midnight' ? 'bg-emerald-500 text-black' : themeName === 'forest' ? 'bg-lime-500 text-black' : 'bg-rose-500 text-black'
+                      } rounded-2xl font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2`}
+                    >
+                      <CheckCircle2 size={18} />
+                      <span>OK</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAdvanceModal(false)}
+                      className={`w-full py-2 ${theme.textMuted} text-xs font-bold uppercase tracking-widest hover:text-current transition-colors`}
+                    >
+                      {t.cancel}
+                    </button>
+                  </div>
+                </form>
               </div>
             </motion.div>
           </div>
@@ -2561,7 +2718,7 @@ export default function ShiftTracker() {
                     }}
                     className="py-3 rounded-xl bg-red-500 text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-500/20 active:scale-95 transition-all"
                   >
-                    {t.delete}
+                    OK
                   </button>
                 </div>
               </div>
