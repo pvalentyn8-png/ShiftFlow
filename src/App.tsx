@@ -155,6 +155,9 @@ const T = {
     hoursShort: "год",
     shiftsShort: "змін",
     clickToPlanHint: "💡 Натисніть на будь-яку картку, щоб розрахувати свій заробіток",
+    applyToCalendar: "Застосувати до календаря",
+    closePlanner: "Вихід",
+    cannotApplyLocked: "🔒 Неможливо застосувати! Календар заблоковано. Розблокуйте його вгорі.",
   },
   pl: {
     appTitle: "Tracker Zmian",
@@ -274,6 +277,9 @@ const T = {
     hoursShort: "godz",
     shiftsShort: "zmian",
     clickToPlanHint: "💡 Kliknij dowolną kartę, aby obliczyć swoje zarobki",
+    applyToCalendar: "Zastosuj do kalendarza",
+    closePlanner: "Wyjście",
+    cannotApplyLocked: "🔒 Nie można zastosować! Kalendarz jest zablokowany. Odblokuj go u góry.",
   }
 };
 
@@ -1593,6 +1599,65 @@ export default function ShiftTracker() {
     setPEarned(cleanVal);
     setPHours(hourRate > 0 ? Math.round((cleanVal / hourRate) * 10) / 10 : 0);
     setPShifts(plannerBaseStats.avgEarned > 0 ? Math.round((cleanVal / plannerBaseStats.avgEarned) * 10) / 10 : 0);
+  };
+
+  const applyPlannerToCalendar = () => {
+    if (isLocked) {
+      setShowLockToast(true);
+      return;
+    }
+
+    const numShifts = Math.min(daysInMonth, Math.max(0, Math.round(pShifts)));
+    const hoursPerShift = pShifts > 0 ? Math.max(0, Math.min(24, pHours / pShifts)) : plannerBaseStats.avgHours;
+
+    setShifts(prev => {
+      const next = { ...prev };
+      
+      // 1. Clear all shifts for the current month
+      for (let d = 1; d <= daysInMonth; d++) {
+        const k = shiftKey(currentYear, currentMonth, d);
+        delete next[k];
+      }
+
+      // 2. Distribute numShifts shifts evenly across the month
+      if (numShifts > 0) {
+        const step = daysInMonth / numShifts;
+        const chosenDays = new Set<number>();
+        for (let i = 0; i < numShifts; i++) {
+          const day = Math.min(daysInMonth, Math.max(1, Math.round(i * step + 1)));
+          // find next available day if clash
+          let finalDay = day;
+          while (chosenDays.has(finalDay) && finalDay <= daysInMonth) {
+            finalDay++;
+          }
+          if (finalDay > daysInMonth) {
+            // search backward
+            finalDay = day - 1;
+            while (chosenDays.has(finalDay) && finalDay >= 1) {
+              finalDay--;
+            }
+          }
+          if (finalDay >= 1 && finalDay <= daysInMonth) {
+            chosenDays.add(finalDay);
+          }
+        }
+
+        // Apply shifts to the chosen days
+        chosenDays.forEach(d => {
+          const k = shiftKey(currentYear, currentMonth, d);
+          const h = Math.round(hoursPerShift * 10) / 10;
+          next[k] = {
+            start: 0,
+            end: h === 24 ? 24 : Math.round(h),
+            hours: h
+          };
+        });
+      }
+
+      return next;
+    });
+
+    setShowPlanner(false);
   };
 
   const prevMonth = () => {
@@ -3071,13 +3136,28 @@ export default function ShiftTracker() {
                 </div>
               </div>
 
-              {/* Close Button */}
-              <button
-                onClick={() => setShowPlanner(false)}
-                className={`w-full py-3 sm:py-4 bg-${theme.accent} hover:opacity-90 rounded-xl sm:rounded-2xl text-white text-[9px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg shadow-${theme.accent}/20 active:scale-95 transition-all`}
-              >
-                {t.yesAdd}
-              </button>
+              {/* Action Buttons */}
+              <div className="flex gap-2 sm:gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowPlanner(false)}
+                  className={`flex-1 py-3 sm:py-4 bg-slate-500/10 hover:bg-slate-500/20 text-current rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest border ${theme.border} active:scale-95 transition-all cursor-pointer`}
+                >
+                  {(t as any).closePlanner}
+                </button>
+                <button
+                  type="button"
+                  onClick={applyPlannerToCalendar}
+                  className={`flex-1 py-3 sm:py-4 ${
+                    isLocked 
+                      ? 'bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-not-allowed opacity-60' 
+                      : `bg-${theme.accent} hover:opacity-90 text-white shadow-lg shadow-${theme.accent}/20 cursor-pointer`
+                  } rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-1 sm:gap-1.5 active:scale-95 transition-all`}
+                >
+                  {isLocked && <Lock size={12} className="shrink-0" />}
+                  {(t as any).applyToCalendar}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
