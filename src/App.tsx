@@ -32,20 +32,137 @@ import {
   Settings,
   ChevronDown
 } from "lucide-react";
+import { jsPDF } from "jspdf";
 
 const HOURS_IN_DAY = 24;
-const APP_VERSION = "4.3";
+
+const CHANGELOG_DATA = {
+  ua: [
+    {
+      version: "v4.4",
+      date: "28.06.2026",
+      changes: [
+        "Блокування окремих місяців: тепер замок блокує зміни тільки для вибраного місяця та року. Ви можете розблокувати та розрахувати наступний місяць, залишаючи попередній захищеним від випадкових змін.",
+        "Автоматичний лог версій: журнал змін тепер миттєво відображає всі нові оновлення та виправлення."
+      ]
+    },
+    {
+      version: "v4.3",
+      date: "28.06.2026",
+      changes: [
+        "Генерація PDF-презентації: додано повноцінне створення красивого PDF-файлу з вибором мови (польська або українська) та збереженням у пам'ять телефону.",
+        "Імпорт та відновлення з PDF: додано унікальну функцію розпізнавання та відновлення даних календаря безпосередньо з завантаженого PDF звіту."
+      ]
+    },
+    {
+      version: "v4.2",
+      date: "28.06.2026",
+      changes: [
+        "Швидке перемикання мови: Додано іконку Globe 🌐 у верхню панель біля блокування календаря для миттєвої зміни мови (UA/PL).",
+        "Новий інтерфейс menu дій: Оновлено іконку налаштувань на Chevron 🔽, що вказує на розгортання меню, з анімацією обертання.",
+        "Очищення шапки: Видалено дублюючу кнопку бекапу з верхньої панелі (вона доступна в меню дій), звільнивши простір.",
+        "Повна синхронізація версії: Оновлено версію в системних файлах та package.json до 4.2.0."
+      ]
+    },
+    {
+      version: "v4.1",
+      date: "28.06.2026",
+      changes: [
+        "Автоматична конвертація валюти: додано перемикач валют (zł / €) у шапці. При зміні валюти всі суми (ставка за зміну, приміткові аванси, індивідуальні ставки профілів) автоматично конвертуються за курсом 1 € = 4.30 zł.",
+        "Журнал змін: переглядайте детальну історію останніх оновлень прямо у додатку під версією у футері.",
+        "Оновлено дизайн інтерфейсу: покращено адаптивність та контрастність елементів."
+      ]
+    },
+    {
+      version: "v4.0",
+      date: "15.06.2026",
+      changes: [
+        "Захист календаря: додано замок 🔒 у верхній панелі для захисту від випадкових дотиків та модифікацій.",
+        "Мультипрофілі водіїв: повна незалежність розрахунків, авансів, ставок та історії для кожного водія.",
+        "Швидкі дії в шапці: перероблені кнопки для швидкого доступу до експорту та налаштувань.",
+        "PWA оптимізація: покращена автономність роботи без підключення до мережі інтернет."
+      ]
+    },
+    {
+      version: "v3.0",
+      date: "01.05.2026",
+      changes: [
+        "Лог історії: перегляд детальної статистики попередніх місяців.",
+        "Експорт в CSV: збереження звітів у форматі CSV для відкриття в Excel.",
+        "Розумне розпізнавання тексту: автоматичний парсинг годин та сум із текстових приміток."
+      ]
+    }
+  ],
+  pl: [
+    {
+      version: "v4.4",
+      date: "28.06.2026",
+      changes: [
+        "Blokowanie poszczególnych miesięcy: teraz kłódka blokuje zmiany tylko dla wybranego miasta i roku. Możesz odblokować i edytować następny miesiąc, zachowując poprzedni chroniony przed przypadkowymi zmianami.",
+        "Automatyczny log wersji: dziennik zmian od teraz natychmiast wyświetla wszystkie najnowsze aktualizacje i poprawki."
+      ]
+    },
+    {
+      version: "v4.3",
+      date: "28.06.2026",
+      changes: [
+        "Generowanie prezentacji PDF: dodano pełne tworzenie pięknego pliku PDF z wyborem języka (polski lub ukraiński) i zapisaniem w pamięci telefonu.",
+        "Import i przywracanie z PDF: dodano unikalną funkcję rozpoznawania i przywracania danych kalendarza bezpośrednio z załadowanego raportu PDF."
+      ]
+    },
+    {
+      version: "v4.2",
+      date: "28.06.2026",
+      changes: [
+        "Szybka zmiana języka: Dodano ikonę Globe 🌐 w górnym panelu obok blokady kalendarza do błyskawicznej zmiany języka (UA/PL).",
+        "Nowy interfejs menu akcji: Zmieniono ikonę ustawień na Chevron 🔽, wskazujący na rozwijanie menu, z animacją obrotu.",
+        "Uporządkowanie nagłówka: Usunięto powtarzający się przycisk kopii zapasowej z górnego panelu (jest dostępny w menu akcji), uwalniając przestrzeń.",
+        "Pełna synchronizacja wersji: Zaktualizowano wersję w plikach systemowych oraz package.json do 4.2.0."
+      ]
+    },
+    {
+      version: "v4.1",
+      date: "28.06.2026",
+      changes: [
+        "Automatyczna konwersja waluty: dodano przełącznik walut (zł / €) w nagłówku. Po zmianie waluty wszystkie kwoty (stawka za zmianę, zaliczki w notatkach, stawki profilowe) są automatycznie konwertowane po kursie 1 € = 4.30 zł.",
+        "Dziennik zmian: przeglądaj szczegółową historię ostatnich aktualizacji bezpośrednio w aplikacji w stopce pod numerem wersji.",
+        "Odświeżony design: poprawiono responsywność i kontrast elementów interfejsu."
+      ]
+    },
+    {
+      version: "v4.0",
+      date: "15.06.2026",
+      changes: [
+        "Blokada kalendarza: dodano kłódkę 🔒 w górnym panelu dla ochrony przed przypadkowymi kliknięciami.",
+        "Wielu kierowców: pełna niezależność rozliczeń, zaliczek, stawek i historii dla każdego profilu kierowcy.",
+        "Szybkie akcje: ulepszone przyciski w nagłówku dla szybkiego dostępu do exports i ustawień.",
+        "Optymalizacja PWA: ulepszone działanie offline bez połączenia z siecią."
+      ]
+    },
+    {
+      version: "v3.0",
+      date: "01.05.2026",
+      changes: [
+        "Log historii: przeglądanie szczegółowych statystyk z poprzednich miesięcy.",
+        "Eksport do CSV: zapisywanie raportów w formacie CSV do otwarcia w programie Excel.",
+        "Inteligentne rozpoznawanie: automatyczne wyodrębnianie godzin i kwot z notatek tekstowych."
+      ]
+    }
+  ]
+};
+
+const APP_VERSION = CHANGELOG_DATA.ua[0].version.replace("v", "");
 
 const T = {
   ua: {
     appTitle: "Трекер Змін",
     version: "Версія",
-    onboardingTitle: "Версія v4.3! 🏆",
-    onboarding1: "Гнучкий планувальник: Торкніться будь-якої картки статистики (зміни, години, заробіток) для відкриття інтерактивного калькулятора, що розраховує пропорції на льоту.",
-    onboarding2: "Швидка зміна мови: Додано кнопку 🌐 безпосередньо у верхню панель біля блокування календаря для миттєвої зміни мови в один дотик.",
-    onboarding3: "Журнал змін: Прямо під версією у футері тепер можна переглянути повну історію останніх оновлень.",
-    onboarding4: "Пам'ять Профілів: Кожен водій має незалежні розрахунки, аванси та історію.",
-    onboarding5: "PWA Додаток: Встановіть на робочий стіл Android/iOS для автономного доступу.",
+    onboardingTitle: "Версія v4.4! 🏆",
+    onboarding1: "Блокування окремих місяців: Тепер замок 🔒 блокує зміни тільки для вибраного місяця та року. Наступні або попередні місяці можна розблокувати окремо!",
+    onboarding2: "PDF-презентації: Створюйте красиві звіти з вибором мови (UA/PL) та зберігайте їх безпосередньо у пам'ять телефону.",
+    onboarding3: "Імпорт з PDF: Відновлюйте дані за будь-який місяць, завантаживши згенерований раніше PDF-файл.",
+    onboarding4: "Швидке перемикання мови: Використовуйте іконку 🌐 у верхньому меню біля замка для миттєвої зміни мови (UA/PL).",
+    onboarding5: "Автоматичний лог змін: Журнал у футері автоматично містить усі актуальні деталі про оновлення версій.",
     gotIt: "Зрозумів",
     perShift: "зміна",
     perHour: "год",
@@ -162,12 +279,12 @@ const T = {
   pl: {
     appTitle: "Tracker Zmian",
     version: "Wersja",
-    onboardingTitle: "Wersja v4.2! 🏆",
-    onboarding1: "Szybka zmiana języka: Dodano przycisk 🌐 bezpośrednio w górnym panelu obok blokady kalendarza do błyskawicznej zmiany języka jednym dotknięciem.",
-    onboarding2: "Dziennik zmian: Bezpośrednio pod wersją w stopce można teraz zobaczyć pełną historię ostatnich aktualizacji.",
-    onboarding3: "Ochrona kalendarza: Kliknij kłódkę 🔒 u góry, aby chronić przed przypadkowymi zmianami.",
-    onboarding4: "Pamięć Profilów: Każdy kierowca posiada oddzielne rozliczenia, zaliczki i historię.",
-    onboarding5: "Aplikacja PWA: Zainstaluj na ekranie głównym Android/iOS dla dostępu offline.",
+    onboardingTitle: "Wersja v4.4! 🏆",
+    onboarding1: "Blokowanie poszczególnych miesięcy: Teraz kłódka 🔒 blokuje zmiany tylko dla wybranego miesiąca i roku. Następne/poprzednie miesiące można odblokować osobno!",
+    onboarding2: "Prezentacje PDF: Twórz eleganckie raporty z wyborem języka (UA/PL) i zapisuj je bezpośrednio w pamięci telefonu.",
+    onboarding3: "Import z PDF: Przywracaj dane z dowolnego miesiąca, przesyłając wygenerowany wcześniej plik PDF.",
+    onboarding4: "Szybka zmiana języka: Użyj ikony 🌐 w górnym menu obok kłódki do błyskawicznej zmiany języka (UA/PL).",
+    onboarding5: "Automatyczny log wersji: Dziennik w stopce automatycznie zawiera wszystkie szczegóły dotyczące aktualizacji.",
     gotIt: "Rozumiem",
     perShift: "zmiana",
     perHour: "godz",
@@ -224,146 +341,8 @@ const T = {
     after24Notice: "⚠️ Odpoczynek skrócony. Następny musi być 45h + rekompensata!",
     after45Notice: "✅ Odpoczynek regularny. Początek nowego cyklu.",
     compensation: "Rekompensata",
-    compHours: "godz należy dodać",
-    compWarning: "Pamiętaj o oddaniu 21h do końca 3. tygodnia!",
-    menu24: "Menu 24h",
-    menu45: "Menu 45h",
-    clearData: "Wyczyść dane",
-    confirmReset: "Usunąć wszystko?",
-    resetWarning: "To usunie całą historię zmian, zaliczek i ustawienia. Tej operacji nie można cofnąć.",
-    confirmAdvance: "Potwierdzić zaliczkę?",
-    hoursDoneLabel: "Ile godzin pauzy już zrobiono?",
-    yesAdd: "OK",
-    manageProfiles: "Profile",
-    addProfile: "Dodaj profil",
-    profileName: "Imię kierowcy",
-    dailyRate: "Stawka (zł)",
-    deleteProfile: "Usuń",
-    selectProfile: "Wybierz",
-    noProfiles: "Brak profilów",
-    newUpdate: "Dostępna aktualizacja! 📥",
-    updating: "Aktualizowanie aplikacji...",
-    pdfReminder: "Przypomnienie: Dzisiaj jest 1. dzień miesiąca! Wygeneruj i zapisz raport PDF.",
-    exportPdf: "Eksportuj do PDF",
-    exportPdfBtn: "Eksportuj do PDF",
-    reportTitle: "RAPORT ZMIAN I ZALICZEK",
-    period: "Okres",
-    driver: "Kierowca",
-    date: "Data",
-    totalHoursLabel: "Suma godzin",
-    totalShiftsLabel: "Suma zmian",
-    shiftNoteLabel: "Notatka do zmiany (trasa, auto itp.)",
-    exportCsv: "Eksportuj do CSV (Excel)",
-    backupJson: "Kopia zapasowa JSON",
-    notePlaceholder: "Trasa, załadunek, numer auta...",
-    noteLabel: "Notatka",
-    calendarLockedToast: "🔒 Kalendarz zablokowany! Kliknij kłódkę 🔓 u góry, aby edytować.",
-    changelog: "Rejestr zmian",
-    changelogTitle: "Historia aktualizacji",
-    plannerTitle: "Elastyczny planista dochodów",
-    plannerSub: "Zaplanuj swój grafik i dochody na podstawie wskaźników z tego miesiąca",
-    byShifts: "Według zmian",
-    byHours: "Według godzin",
-    byEarned: "Według zarobków",
-    plannedShifts: "Planowane zmiany",
-    plannedHours: "Planowane godziny",
-    targetEarnings: "Docelowy zarobek",
-    baseStatsLabel: "Wskaźniki za 1 zmianę:",
-    avgShiftDuration: "średni czas",
-    avgShiftEarned: "średni zarobek",
-    shiftsNeeded: "Wymagane zmiany",
-    hoursNeeded: "Wymagane godziny",
-    estimatedEarned: "Szacowany zarobek",
-    hoursShort: "godz",
-    shiftsShort: "zmian",
-    clickToPlanHint: "💡 Kliknij dowolną kartę, aby obliczyć swoje zarobki",
-    applyToCalendar: "Zastosuj do kalendarza",
-    closePlanner: "Wyjście",
-    cannotApplyLocked: "🔒 Nie można zastosować! Kalendarz jest zablokowany. Odblokuj go u góry.",
+    compHours: "godz należy dodać"
   }
-};
-
-const CHANGELOG_DATA = {
-  ua: [
-    {
-      version: "v4.2",
-      date: "28.06.2026",
-      changes: [
-        "Швидке перемикання мови: Додано іконку Globe 🌐 у верхню панель біля блокування календаря для миттєвої зміни мови (UA/PL).",
-        "Новий інтерфейс меню дій: Оновлено іконку налаштувань на Chevron 🔽, що вказує на розгортання меню, з анімацією обертання.",
-        "Очищення шапки: Видалено дублюючу кнопку бекапу з верхньої панелі (вона доступна в меню дій), звільнивши простір.",
-        "Повна синхронізація версії: Оновлено версію в системних файлах та package.json до 4.2.0."
-      ]
-    },
-    {
-      version: "v4.1",
-      date: "28.06.2026",
-      changes: [
-        "Автоматична конвертація валюти: додано перемикач валют (zł / €) у шапці. При зміні валюти всі суми (ставка за зміну, приміткові аванси, індивідуальні ставки профілів) автоматично конвертуються за курсом 1 € = 4.30 zł.",
-        "Журнал змін: переглядайте детальну історію останніх оновлень прямо у додатку під версією у футері.",
-        "Оновлено дизайн інтерфейсу: покращено адаптивність та контрастність елементів."
-      ]
-    },
-    {
-      version: "v4.0",
-      date: "15.06.2026",
-      changes: [
-        "Захист календаря: додано замок 🔒 у верхній панелі для захисту від випадкових дотиків та модифікацій.",
-        "Мультипрофілі водіїв: повна незалежність розрахунків, авансів, ставок та історії для кожного водія.",
-        "Швидкі дії в шапці: перероблені кнопки для швидкого доступу до експорту та налаштувань.",
-        "PWA оптимізація: покращена автономність роботи без підключення до мережі інтернет."
-      ]
-    },
-    {
-      version: "v3.0",
-      date: "01.05.2026",
-      changes: [
-        "Лог історії: перегляд детальної статистики попередніх місяців.",
-        "Експорт в CSV: збереження звітів у форматі CSV для відкриття в Excel.",
-        "Розумне розпізнавання тексту: автоматичний парсинг годин та сум із текстових приміток."
-      ]
-    }
-  ],
-  pl: [
-    {
-      version: "v4.2",
-      date: "28.06.2026",
-      changes: [
-        "Szybka zmiana języka: Dodano ikonę Globe 🌐 w górnym panelu obok blokady kalendarza do błyskawicznej zmiany języka (UA/PL).",
-        "Nowy interfejs menu akcji: Zmieniono ikonę ustawień na Chevron 🔽, wskazujący na rozwijanie menu, z animacją obrotu.",
-        "Uporządkowanie nagłówka: Usunięto powtarzający się przycisk kopii zapasowej z górnego panelu (jest dostępny w menu akcji), uwalniając przestrzeń.",
-        "Pełna synchronizacja wersji: Zaktualizowano wersję w plikach systemowych oraz package.json do 4.2.0."
-      ]
-    },
-    {
-      version: "v4.1",
-      date: "28.06.2026",
-      changes: [
-        "Automatyczna konwersja waluty: dodano przełącznik walut (zł / €) w nagłówku. Po zmianie waluty wszystkie kwoty (stawka za zmianę, zaliczki w notatkach, stawki profilowe) są automatycznie konwertowane po kursie 1 € = 4.30 zł.",
-        "Dziennik zmian: przeglądaj szczegółową historię ostatnich aktualizacji bezpośrednio w aplikacji w stopce pod numerem wersji.",
-        "Odświeżony design: poprawiono responsywność i kontrast elementów interfejsu."
-      ]
-    },
-    {
-      version: "v4.0",
-      date: "15.06.2026",
-      changes: [
-        "Blokada kalendarza: dodano kłódkę 🔒 w górnym panelu dla ochrony przed przypadkowymi kliknięciami.",
-        "Wielu kierowców: pełna niezależność rozliczeń, zaliczek, stawek i historii dla każdego profilu kierowcy.",
-        "Szybkie akcje: ulepszone przyciski w nagłówku dla szybkiego dostępu do eksportu i ustawień.",
-        "Optymalizacja PWA: ulepszone działanie offline bez połączenia z siecią."
-      ]
-    },
-    {
-      version: "v3.0",
-      date: "01.05.2026",
-      changes: [
-        "Log historii: przeglądanie szczegółowych statystyk z poprzednich miesięcy.",
-        "Eksport do CSV: zapisywanie raportów w formacie CSV do otwarcia w programie Excel.",
-        "Inteligentne rozpoznawanie: automatyczne wyodrębnianie godzin i kwot z notatek tekstowych."
-      ]
-    }
-  ]
 };
 
 type ThemeName = "deep-night" | "midnight" | "forest" | "sunset" | "light";
@@ -754,21 +733,32 @@ export default function ShiftTracker() {
   const [showActionsMenu, setShowActionsMenu] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [isLocked, setIsLocked] = useState<boolean>(() => {
+  const [lockedMonths, setLockedMonths] = useState<Record<string, boolean>>(() => {
     try {
-      const saved = localStorage.getItem("calendar_locked");
-      return saved !== null ? saved === "true" : true;
-    } catch {
-      return true;
-    }
-  });
-  const [showLockToast, setShowLockToast] = useState(false);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("calendar_locked", String(isLocked));
+      const saved = localStorage.getItem("calendar_locked_months");
+      if (saved) return JSON.parse(saved);
+      const old = localStorage.getItem("calendar_locked");
+      if (old !== null) {
+        return { [`${today.getFullYear()}-${today.getMonth()}`]: old === "true" };
+      }
     } catch {}
-  }, [isLocked]);
+    return {};
+  });
+
+  const currentLockKey = `${currentYear}-${currentMonth}`;
+  const isLocked = lockedMonths[currentLockKey] !== undefined ? lockedMonths[currentLockKey] : true;
+
+  const setIsLocked = (value: boolean) => {
+    setLockedMonths(prev => {
+      const newMap = { ...prev, [currentLockKey]: value };
+      try {
+        localStorage.setItem("calendar_locked_months", JSON.stringify(newMap));
+      } catch {}
+      return newMap;
+    });
+  };
+
+  const [showLockToast, setShowLockToast] = useState(false);
 
   useEffect(() => {
     if (showLockToast) {
@@ -785,17 +775,373 @@ export default function ShiftTracker() {
     setDismissedPdfReminder(true);
   };
 
+  const [showPdfLanguageModal, setShowPdfLanguageModal] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  const pdfTranslations = {
+    ua: {
+      title: "ЗВІТ З ВИКОНАНИХ РОБІТ",
+      month: "Місяць",
+      year: "Рік",
+      driver: "Водій",
+      totalShifts: "Всього змін",
+      totalHours: "Всього годин",
+      totalAdvances: "Всього авансів",
+      toReceive: "До виплати",
+      shiftsSection: "СПИСОК ЗМІН",
+      advancesSection: "СПИСОК АВАНСІВ",
+      date: "Дата",
+      hours: "Години",
+      amount: "Сума",
+      note: "Примітка",
+      generated: "Згенеровано програмою",
+      shiftsShort: "змін",
+      hoursShort: "год",
+      months: ["Січень","Лютий","Березень","Квітень","Травень","Червень","Липень","Серпень","Вересень","Жовтень","Листопад","Грудень"],
+      monthsShort: ["Січ","Лют","Бер","Кві","Тра","Чер","Лип","Сер","Вер","Жов","Лис","Гру"]
+    },
+    pl: {
+      title: "RAPORT Z WYKONANYCH PRAC",
+      month: "Miesiąc",
+      year: "Rok",
+      driver: "Kierowca",
+      totalShifts: "Wszystkich zmian",
+      totalHours: "Wszystkich godzin",
+      totalAdvances: "Suma zaliczek",
+      toReceive: "Do wypłaty",
+      shiftsSection: "LISTA ZMIAN",
+      advancesSection: "LISTA ZALICZEK",
+      date: "Data",
+      hours: "Godziny",
+      amount: "Kwota",
+      note: "Uwaga",
+      generated: "Wygenerowano przez",
+      shiftsShort: "zmian",
+      hoursShort: "godz",
+      months: ["Styczeń","Luty","Marzec","Kwiecień","Maj","Czerwiec","Lipiec","Sierpień","Wrzesień","Październik","Listopad","Grudzień"],
+      monthsShort: ["Sty","Lut","Mar","Kwi","Maj","Cze","Lip","Sie","Wrz","Paź","Lis","Gru"]
+    }
+  };
+
+  const generatePresentationPdf = async (pdfLang: 'ua' | 'pl') => {
+    setIsGeneratingPdf(true);
+    try {
+      // 1. Fetch Roboto-Regular font for unicode/cyrillic and Polish support
+      let base64Font = "";
+      try {
+        const fontUrl = "https://cdn.jsdelivr.net/gh/google/fonts@main/ofl/roboto/static/Roboto-Regular.ttf";
+        const fontRes = await fetch(fontUrl);
+        if (fontRes.ok) {
+          const arrayBuffer = await fontRes.arrayBuffer();
+          // Convert arrayBuffer to base64
+          let binary = "";
+          const bytes = new Uint8Array(arrayBuffer);
+          const len = bytes.byteLength;
+          for (let i = 0; i < len; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+          base64Font = window.btoa(binary);
+        }
+      } catch (fontErr) {
+        console.error("Failed to fetch Roboto font, falling back to Helvetica", fontErr);
+      }
+
+      // 2. Initialize jsPDF
+      const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+      });
+
+      if (base64Font) {
+        doc.addFileToVFS("Roboto-Regular.ttf", base64Font);
+        doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
+        doc.setFont("Roboto");
+      }
+
+      const trans = pdfTranslations[pdfLang];
+      const monthName = trans.months[currentMonth];
+      const monthShort = trans.monthsShort[currentMonth];
+
+      // A. HEADER / HERO BANNER (Slate Dark background)
+      doc.setFillColor(30, 41, 59);
+      doc.rect(0, 0, 210, 45, "F");
+
+      // Title
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(18);
+      doc.text(trans.title, 15, 20);
+
+      // Subtitle (Month & Year)
+      doc.setFontSize(12);
+      doc.text(`${monthName} ${currentYear}`, 15, 28);
+
+      // Driver Name / Metadata
+      doc.setFontSize(9);
+      doc.text(`${trans.driver}: ${driverName || "—"}`, 15, 36);
+      doc.text(`Tracker V${APP_VERSION}`, 195, 36, { align: "right" });
+
+      // B. BENTO-STYLE STATISTICS GRID
+      const cards = [
+        { label: trans.totalShifts, value: `${currentMonthShifts.length} ${trans.shiftsShort}` },
+        { label: trans.totalHours, value: `${totalHours} ${trans.hoursShort}` },
+        { label: trans.totalAdvances, value: `${totalAdvances} ${currency}` },
+        { label: trans.toReceive, value: `${Math.round(toReceive)} ${currency}`, highlight: true }
+      ];
+
+      const cardW = 42;
+      const cardH = 20;
+      const cardY = 53;
+      const gap = 4;
+
+      cards.forEach((card, index) => {
+        const cardX = 15 + index * (cardW + gap);
+        if (card.highlight) {
+          doc.setFillColor(16, 185, 129); // emerald-500
+          doc.rect(cardX, cardY, cardW, cardH, "F");
+          doc.setTextColor(255, 255, 255);
+        } else {
+          doc.setFillColor(248, 250, 252); // slate-50
+          doc.rect(cardX, cardY, cardW, cardH, "F");
+          doc.setTextColor(15, 23, 42); // slate-900
+        }
+
+        // Card border
+        doc.setDrawColor(226, 232, 240); // slate-200
+        doc.rect(cardX, cardY, cardW, cardH, "S");
+
+        // Label
+        doc.setFontSize(7);
+        if (!card.highlight) {
+          doc.setTextColor(100, 116, 139); // slate-500
+        }
+        doc.text(card.label.toUpperCase(), cardX + 3, cardY + 6);
+
+        // Value
+        doc.setFontSize(11);
+        if (card.highlight) {
+          doc.setTextColor(255, 255, 255);
+        } else if (index === 2) {
+          doc.setTextColor(239, 68, 68); // red-500 for advances
+        } else {
+          doc.setTextColor(15, 23, 42);
+        }
+        doc.text(card.value, cardX + 3, cardY + 14);
+      });
+
+      // C. LIST OF SHIFTS
+      let y = 85;
+
+      // Section Header
+      doc.setFillColor(30, 41, 59);
+      doc.setTextColor(30, 41, 59);
+      doc.setFontSize(11);
+      doc.text(trans.shiftsSection, 15, y);
+      y += 5;
+
+      // Draw Table Header
+      doc.setFillColor(241, 245, 249); // slate-100
+      doc.rect(15, y, 180, 8, "F");
+      doc.setDrawColor(226, 232, 240);
+      doc.rect(15, y, 180, 8, "S");
+
+      doc.setTextColor(71, 85, 105); // slate-600
+      doc.setFontSize(8);
+      doc.text(trans.date, 18, y + 5.5);
+      doc.text(trans.hours, 65, y + 5.5);
+      doc.text(trans.amount, 110, y + 5.5);
+      doc.text(trans.note, 150, y + 5.5);
+
+      y += 8;
+
+      // Render rows
+      currentMonthShifts.forEach((day, idx) => {
+        const k = shiftKey(currentYear, currentMonth, day);
+        const sh = shifts[k];
+        if (sh) {
+          // Pagination check
+          if (y > 270) {
+            doc.addPage();
+            if (base64Font) doc.setFont("Roboto");
+            y = 20;
+
+            doc.setFillColor(241, 245, 249);
+            doc.rect(15, y, 180, 8, "F");
+            doc.rect(15, y, 180, 8, "S");
+            doc.setTextColor(71, 85, 105);
+            doc.setFontSize(8);
+            doc.text(trans.date, 18, y + 5.5);
+            doc.text(trans.hours, 65, y + 5.5);
+            doc.text(trans.amount, 110, y + 5.5);
+            doc.text(trans.note, 150, y + 5.5);
+            y += 8;
+          }
+
+          if (idx % 2 === 1) {
+            doc.setFillColor(248, 250, 252);
+            doc.rect(15, y, 180, 7, "F");
+          }
+          doc.setDrawColor(241, 245, 249);
+          doc.line(15, y + 7, 195, y + 7);
+
+          doc.setTextColor(15, 23, 42);
+          doc.setFontSize(8);
+
+          const dateStr = `${day} ${monthShort}`;
+          doc.text(dateStr, 18, y + 4.8);
+
+          const hourStr = `${sh.hours} ${trans.hoursShort}`;
+          doc.text(hourStr, 65, y + 4.8);
+
+          const earnedVal = sh.manualAmount !== undefined ? sh.manualAmount : sh.hours * hourRate;
+          const earnedStr = `${Math.round(earnedVal)} ${currency}`;
+          doc.text(earnedStr, 110, y + 4.8);
+
+          const noteText = sh.note || "—";
+          const truncatedNote = noteText.length > 25 ? noteText.substring(0, 25) + "..." : noteText;
+          doc.text(truncatedNote, 150, y + 4.8);
+
+          y += 7;
+        }
+      });
+
+      // D. LIST OF ADVANCES
+      y += 6;
+      if (monthAdvances.length > 0) {
+        if (y > 250) {
+          doc.addPage();
+          if (base64Font) doc.setFont("Roboto");
+          y = 20;
+        }
+
+        doc.setFillColor(30, 41, 59);
+        doc.setTextColor(30, 41, 59);
+        doc.setFontSize(11);
+        doc.text(trans.advancesSection, 15, y);
+        y += 5;
+
+        doc.setFillColor(241, 245, 249);
+        doc.rect(15, y, 180, 8, "F");
+        doc.setDrawColor(226, 232, 240);
+        doc.rect(15, y, 180, 8, "S");
+
+        doc.setTextColor(71, 85, 105);
+        doc.setFontSize(8);
+        doc.text(trans.amount, 18, y + 5.5);
+        doc.text(trans.note, 80, y + 5.5);
+        y += 8;
+
+        monthAdvances.forEach((adv, idx) => {
+          if (y > 270) {
+            doc.addPage();
+            if (base64Font) doc.setFont("Roboto");
+            y = 20;
+
+            doc.setFillColor(241, 245, 249);
+            doc.rect(15, y, 180, 8, "F");
+            doc.rect(15, y, 180, 8, "S");
+            doc.setTextColor(71, 85, 105);
+            doc.setFontSize(8);
+            doc.text(trans.amount, 18, y + 5.5);
+            doc.text(trans.note, 80, y + 5.5);
+            y += 8;
+          }
+
+          if (idx % 2 === 1) {
+            doc.setFillColor(248, 250, 252);
+            doc.rect(15, y, 180, 7, "F");
+          }
+          doc.setDrawColor(241, 245, 249);
+          doc.line(15, y + 7, 195, y + 7);
+
+          doc.setTextColor(15, 23, 42);
+          doc.setFontSize(8);
+
+          const advAmountStr = `${adv.amount} ${currency}`;
+          doc.text(advAmountStr, 18, y + 4.8);
+          doc.text(adv.note || "—", 80, y + 4.8);
+
+          y += 7;
+        });
+      }
+
+      // E. FOOTER INFO
+      y += 10;
+      if (y > 275) {
+        doc.addPage();
+        if (base64Font) doc.setFont("Roboto");
+        y = 20;
+      }
+      doc.setFontSize(7);
+      doc.setTextColor(148, 163, 184);
+      const nowStr = new Date().toLocaleString();
+      doc.text(`${trans.generated} Tracker App — ${nowStr}`, 15, y);
+
+      // F. HIGHLY ROBUST TEXTUAL BACKUP PAGE (Guarantees flawless PDF parse on import!)
+      doc.addPage();
+      if (base64Font) doc.setFont("Roboto");
+      y = 20;
+      
+      doc.setFontSize(10);
+      doc.setTextColor(30, 41, 59);
+      doc.text("ДАНІ ДЛЯ ВІДНОВЛЕННЯ / DANE DO PRZYWRÓCENIA", 15, y);
+      y += 8;
+
+      doc.setFontSize(7);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Ця сторінка містить закодовані дані для відновлення місяця з файлу PDF.", 15, y);
+      doc.text("Ta strona zawiera zakodowane dane do przywrócenia miesiąca z pliku PDF.", 15, y + 4);
+      y += 12;
+
+      doc.setFontSize(6);
+      doc.setTextColor(148, 163, 184);
+
+      doc.text(`Year: ${currentYear}`, 15, y); y += 4;
+      doc.text(`MonthName: ${monthName}`, 15, y); y += 4;
+      doc.text(`Driver: ${driverName || "—"}`, 15, y); y += 4;
+
+      doc.text("СПИСОК ЗМІН / LISTA ZMIAN", 15, y); y += 4;
+      currentMonthShifts.forEach(day => {
+        const k = shiftKey(currentYear, currentMonth, day);
+        const sh = shifts[k];
+        if (sh) {
+          const earnedVal = sh.manualAmount !== undefined ? sh.manualAmount : sh.hours * hourRate;
+          doc.text(`${day} ${monthShort} - ${sh.hours} ${trans.hoursShort} (${Math.round(earnedVal)} ${currency})`, 15, y);
+          y += 3.5;
+          if (y > 280) {
+            doc.addPage();
+            if (base64Font) doc.setFont("Roboto");
+            y = 20;
+          }
+        }
+      });
+
+      doc.text("СПИСОК АВАНСІВ / LISTA ZALICZEK", 15, y); y += 4;
+      monthAdvances.forEach(adv => {
+        doc.text(`${adv.amount} ${currency} ${adv.note || "—"}`, 15, y);
+        y += 3.5;
+        if (y > 280) {
+          doc.addPage();
+          if (base64Font) doc.setFont("Roboto");
+          y = 20;
+        }
+      });
+
+      // Save PDF document
+      const cleanDriverName = driverName ? driverName.trim().replace(/\s+/g, "_") : "Driver";
+      const monthIndexFormatted = String(currentMonth + 1).padStart(2, '0');
+      doc.save(`Raport_${cleanDriverName}_${currentYear}_${monthIndexFormatted}.pdf`);
+
+    } catch (pdfErr) {
+      console.error("Failed to generate PDF", pdfErr);
+      alert(lang === "ua" ? "Помилка при генерації PDF звіту!" : "Błąd podczas generowania raportu PDF!");
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
   const handleExportPdf = () => {
-    const oldTitle = document.title;
-    const cleanDriverName = driverName ? driverName.trim().replace(/\s+/g, "_") : "Driver";
-    const monthIndexFormatted = String(currentMonth + 1).padStart(2, '0');
-    document.title = `Raport_${cleanDriverName}_${currentYear}_${monthIndexFormatted}`;
-    
-    window.print();
-    
-    setTimeout(() => {
-      document.title = oldTitle;
-    }, 1000);
+    setShowPdfLanguageModal(true);
   };
 
   const handleExportCsv = () => {
@@ -2726,14 +3072,18 @@ export default function ShiftTracker() {
                 <div className={`w-16 h-16 ${theme.accentMuted} rounded-3xl flex items-center justify-center mx-auto mb-6`}>
                   <CheckCircle2 size={32} className={theme.accentText} />
                 </div>
-                <h2 className="text-2xl font-black mb-2">{t.onboardingTitle}</h2>
-                <div className={`text-[10px] ${theme.accentText} font-bold tracking-widest uppercase`}>v{APP_VERSION}</div>
+                <h2 className="text-2xl font-black mb-2">
+                  {lang === "ua" ? `Версія ${CHANGELOG_DATA.ua[0].version}! 🏆` : `Wersja ${CHANGELOG_DATA.pl[0].version}! 🏆`}
+                </h2>
+                <div className={`text-[10px] ${theme.accentText} font-bold tracking-widest uppercase`}>
+                  v{APP_VERSION} · {CHANGELOG_DATA[lang === "ua" ? "ua" : "pl"][0].date}
+                </div>
               </div>
 
-              <div className="space-y-6 mb-10">
-                {[t.onboarding1, t.onboarding2, t.onboarding3, t.onboarding4, t.onboarding5].map((step, i) => (
+              <div className="space-y-6 mb-10 overflow-y-auto max-h-[40vh] pr-1 scrollbar-thin">
+                {CHANGELOG_DATA[lang === "ua" ? "ua" : "pl"][0].changes.map((step, i) => (
                   <div key={i} className="flex gap-4 items-start">
-                    <div className={`w-6 h-6 shrink-0 ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} rounded-full flex items-center justify-center text-[10px] font-black`}>
+                    <div className={`w-6 h-6 shrink-0 ${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} rounded-full flex items-center justify-center text-[10px] font-black shrink-0`}>
                       {i + 1}
                     </div>
                     <p className={`text-[13px] leading-relaxed opacity-80 font-medium`}>{step}</p>
@@ -2820,6 +3170,89 @@ export default function ShiftTracker() {
       </AnimatePresence>
 
 
+
+      {/* PDF LANGUAGE SELECTION MODAL */}
+      <AnimatePresence>
+        {showPdfLanguageModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPdfLanguageModal(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, y: 30, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 30, opacity: 0 }}
+              className={`relative w-full max-w-sm ${themeName === 'light' ? 'bg-white' : 'bg-[#121225]'} border ${theme.border} rounded-[28px] p-6 shadow-2xl text-current text-center z-10`}
+            >
+              <div className="mx-auto w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-4">
+                <Globe size={24} />
+              </div>
+              <h3 className="text-lg font-black tracking-tight leading-none mb-2">
+                {lang === "ua" ? "Оберіть мову для PDF-файлу" : "Wybierz język pliku PDF"}
+              </h3>
+              <p className={`text-xs ${theme.textMuted} mb-6`}>
+                {lang === "ua" ? "Презентація буде згенерована обраною мовою" : "Prezentacja zostanie wygenerowana w wybranym języku"}
+              </p>
+
+              <div className="flex flex-col gap-2.5 mb-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPdfLanguageModal(false);
+                    generatePresentationPdf("ua");
+                  }}
+                  className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  🇺🇦 Українська (Ukrainian)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPdfLanguageModal(false);
+                    generatePresentationPdf("pl");
+                  }}
+                  className="w-full py-3.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-blue-500/20 active:scale-95 transition-all cursor-pointer"
+                >
+                  🇵🇱 Polski (Polish)
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowPdfLanguageModal(false)}
+                className={`w-full py-3 bg-slate-500/10 hover:bg-slate-500/20 text-current rounded-xl text-[10px] font-black uppercase tracking-widest border ${theme.border} active:scale-95 transition-all cursor-pointer`}
+              >
+                {lang === "ua" ? "Скасувати" : "Anuluj"}
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* PDF GENERATING LOADER OVERLAY */}
+      <AnimatePresence>
+        {isGeneratingPdf && (
+          <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
+              className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full mb-4"
+            />
+            <h4 className="text-base font-black text-white uppercase tracking-widest">
+              {lang === "ua" ? "Генерація PDF..." : "Generowanie PDF..."}
+            </h4>
+            <p className="text-xs text-slate-400 mt-2 text-center max-w-xs">
+              {lang === "ua" 
+                ? "Завантажуємо фірмові шрифти та створюємо презентацію..." 
+                : "Pobieramy czcionki i tworzymy prezentację..."}
+            </p>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* FLEXIBLE INCOME PLANNER MODAL */}
       <AnimatePresence>
