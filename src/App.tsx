@@ -32,16 +32,16 @@ import {
 } from "lucide-react";
 
 const HOURS_IN_DAY = 24;
-const APP_VERSION = "4.0";
+const APP_VERSION = "4.1";
 
 const T = {
   ua: {
     appTitle: "Трекер Змін",
     version: "Версія",
-    onboardingTitle: "Фінальна версія v4.0! 🏆",
-    onboarding1: "Захист календаря: Натисніть на замок 🔒 у верхній панелі для захисту від випадкових натискань.",
-    onboarding2: "Оптимальний дизайн: Зручні швидкі кнопки-іконки у шапці для миттєвого доступу.",
-    onboarding3: "Автономність: Повністю автономне збереження та робота без розряду батареї.",
+    onboardingTitle: "Версія v4.1! 🏆",
+    onboarding1: "Конвертація Валют: Додано кнопку перемикання валюти (zł / €) у шапці з автоматичним перерахунком ставок, авансів та профілів за курсом 1 € = 4.30 zł.",
+    onboarding2: "Журнал змін: Прямо під версією у футері тепер можна переглянути повну історію останніх оновлень.",
+    onboarding3: "Захист календаря: Натисніть на замок 🔒 у верхній панелі для захисту від випадкових натискань.",
     onboarding4: "Пам'ять Профілів: Кожен водій має незалежні розрахунки, аванси та історію.",
     onboarding5: "PWA Додаток: Встановіть на робочий стіл Android/iOS для автономного доступу.",
     gotIt: "Зрозумів",
@@ -134,14 +134,16 @@ const T = {
     notePlaceholder: "Маршрут, завантаження, номер авто...",
     noteLabel: "Примітка",
     calendarLockedToast: "🔒 Календар заблоковано! Натисніть на замок 🔓 вгорі, щоб редагувати.",
+    changelog: "Журнал змін",
+    changelogTitle: "Історія оновлень",
   },
   pl: {
     appTitle: "Tracker Zmian",
     version: "Wersja",
-    onboardingTitle: "Wersja finałowa v4.0! 🏆",
-    onboarding1: "Ochrona kalendarza: Kliknij kłódkę 🔒 u góry, aby chronić przed przypadkowymi zmianami.",
-    onboarding2: "Optymalny design: Wygodne, szybkie przyciski-ikony w nagłówku do natychmiastowego dostępu.",
-    onboarding3: "Szybka autonomia: W pełni autonomiczne zapisywanie i działanie bez rozładowywania baterii.",
+    onboardingTitle: "Wersja v4.1! 🏆",
+    onboarding1: "Konwersja Walut: Dodano przycisk przełączania waluty (zł / €) w nagłówku z automatycznym przeliczaniem stawek, zaliczek i profili według kursu 1 € = 4.30 zł.",
+    onboarding2: "Dziennik zmian: Bezpośrednio pod wersją w stopce można teraz zobaczyć pełną historię ostatnich aktualizacji.",
+    onboarding3: "Ochrona kalendarza: Kliknij kłódkę 🔒 u góry, aby chronić przed przypadkowymi zmianami.",
     onboarding4: "Pamięć Profilów: Każdy kierowca posiada oddzielne rozliczenia, zaliczki i historię.",
     onboarding5: "Aplikacja PWA: Zainstaluj na ekranie głównym Android/iOS dla dostępu offline.",
     gotIt: "Rozumiem",
@@ -234,7 +236,72 @@ const T = {
     notePlaceholder: "Trasa, załadunek, numer auta...",
     noteLabel: "Notatka",
     calendarLockedToast: "🔒 Kalendarz zablokowany! Kliknij kłódkę 🔓 u góry, aby edytować.",
+    changelog: "Rejestr zmian",
+    changelogTitle: "Historia aktualizacji",
   }
+};
+
+const CHANGELOG_DATA = {
+  ua: [
+    {
+      version: "v4.1",
+      date: "28.06.2026",
+      changes: [
+        "Автоматична конвертація валюти: додано перемикач валют (zł / €) у шапці. При зміні валюти всі суми (ставка за зміну, приміткові аванси, індивідуальні ставки профілів) автоматично конвертуються за курсом 1 € = 4.30 zł.",
+        "Журнал змін: переглядайте детальну історію останніх оновлень прямо у додатку під версією у футері.",
+        "Оновлено дизайн інтерфейсу: покращено адаптивність та контрастність елементів."
+      ]
+    },
+    {
+      version: "v4.0",
+      date: "15.06.2026",
+      changes: [
+        "Захист календаря: додано замок 🔒 у верхній панелі для захисту від випадкових дотиків та модифікацій.",
+        "Мультипрофілі водіїв: повна незалежність розрахунків, авансів, ставок та історії для кожного водія.",
+        "Швидкі дії в шапці: перероблені кнопки для швидкого доступу до експорту та налаштувань.",
+        "PWA оптимізація: покращена автономність роботи без підключення до мережі інтернет."
+      ]
+    },
+    {
+      version: "v3.0",
+      date: "01.05.2026",
+      changes: [
+        "Лог історії: перегляд детальної статистики попередніх місяців.",
+        "Експорт в CSV: збереження звітів у форматі CSV для відкриття в Excel.",
+        "Розумне розпізнавання тексту: автоматичний парсинг годин та сум із текстових приміток."
+      ]
+    }
+  ],
+  pl: [
+    {
+      version: "v4.1",
+      date: "28.06.2026",
+      changes: [
+        "Automatyczna konwersja waluty: dodano przełącznik walut (zł / €) w nagłówku. Po zmianie waluty wszystkie kwoty (stawka za zmianę, zaliczki w notatkach, stawki profilowe) są automatycznie konwertowane po kursie 1 € = 4.30 zł.",
+        "Dziennik zmian: przeglądaj szczegółową historię ostatnich aktualizacji bezpośrednio w aplikacji w stopce pod numerem wersji.",
+        "Odświeżony design: poprawiono responsywność i kontrast elementów interfejsu."
+      ]
+    },
+    {
+      version: "v4.0",
+      date: "15.06.2026",
+      changes: [
+        "Blokada kalendarza: dodano kłódkę 🔒 w górnym panelu dla ochrony przed przypadkowymi kliknięciami.",
+        "Wielu kierowców: pełna niezależność rozliczeń, zaliczek, stawek i historii dla każdego profilu kierowcy.",
+        "Szybkie akcje: ulepszone przyciski w nagłówku dla szybkiego dostępu do eksportu i ustawień.",
+        "Optymalizacja PWA: ulepszone działanie offline bez połączenia z siecią."
+      ]
+    },
+    {
+      version: "v3.0",
+      date: "01.05.2026",
+      changes: [
+        "Log historii: przeglądanie szczegółowych statystyk z poprzednich miesięcy.",
+        "Eksport do CSV: zapisywanie raportów w formacie CSV do otwarcia w programie Excel.",
+        "Inteligentne rozpoznawanie: automatyczne wyodrębnianie godzin i kwot z notatek tekstowych."
+      ]
+    }
+  ]
 };
 
 type ThemeName = "deep-night" | "midnight" | "forest" | "sunset" | "light";
@@ -404,8 +471,105 @@ export default function ShiftTracker() {
     
     return "pl"; // Default
   });
+  const [currency, setCurrency] = useState<"zł" | "€">(() => {
+    const dedicated = localStorage.getItem("shift_tracker_preferred_currency");
+    if (dedicated === "zł" || dedicated === "€") return dedicated;
+    try {
+      const saved = localStorage.getItem("shift_tracker_data_v3");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.currency === "zł" || parsed.currency === "€") return parsed.currency;
+      }
+    } catch {}
+    return "zł";
+  });
+
+  const handleCurrencyChange = (newCurrency: "zł" | "€") => {
+    if (newCurrency === currency) return;
+    
+    const rate = 4.3; // 1 EUR = 4.3 PLN
+    const convertValue = (val: number, toEuro: boolean) => {
+      if (toEuro) {
+        return Math.round(val / rate);
+      } else {
+        return Math.round(val * rate);
+      }
+    };
+
+    const toEuro = newCurrency === "€";
+
+    // 1. Convert shiftRate
+    if (typeof shiftRate === "number") {
+      setShiftRate(convertValue(shiftRate, toEuro));
+    } else if (typeof shiftRate === "string" && shiftRate !== "") {
+      const parsed = parseFloat(shiftRate);
+      if (!isNaN(parsed)) {
+        setShiftRate(String(convertValue(parsed, toEuro)));
+      }
+    }
+
+    // 2. Convert custom manual amounts in shifts
+    setShifts(prev => {
+      const updated = { ...prev };
+      let changed = false;
+      for (const key in updated) {
+        const sh = updated[key];
+        if (sh && sh.manualAmount !== undefined) {
+          updated[key] = {
+            ...sh,
+            manualAmount: convertValue(sh.manualAmount, toEuro)
+          };
+          changed = true;
+        }
+      }
+      return changed ? updated : prev;
+    });
+
+    // 3. Convert advances
+    setAdvances(prev => {
+      const updated = { ...prev };
+      let changed = false;
+      for (const key in updated) {
+        const advList = updated[key];
+        if (advList && advList.length > 0) {
+          updated[key] = advList.map(adv => ({
+            ...adv,
+            amount: convertValue(adv.amount, toEuro)
+          }));
+          changed = true;
+        }
+      }
+      return changed ? updated : prev;
+    });
+
+    // 4. Convert profiles rates
+    setProfiles(prev => {
+      if (prev.length === 0) return prev;
+      return prev.map(p => ({
+        ...p,
+        rate: convertValue(p.rate, toEuro)
+      }));
+    });
+
+    setCurrency(newCurrency);
+  };
+
   const [themeName, setThemeName] = useState<ThemeName>("light");
-  const t = T[lang];
+  const t = useMemo(() => {
+    const original = T[lang];
+    const replaced: Record<string, any> = {};
+    for (const key in original) {
+      const val = original[key as keyof typeof original];
+      if (typeof val === "string") {
+        replaced[key] = val.replace(/zł/g, currency);
+      } else if (Array.isArray(val)) {
+        replaced[key] = val.map(item => typeof item === "string" ? item.replace(/zł/g, currency) : item);
+      } else {
+        replaced[key] = val;
+      }
+    }
+    return replaced as typeof T["ua"];
+  }, [lang, currency]);
   const theme = THEMES[themeName];
 
   // Persistence Key
@@ -441,6 +605,7 @@ export default function ShiftTracker() {
   const [advanceToDelete, setAdvanceToDelete] = useState<number | null>(null);
   const [editAdvanceId, setEditAdvanceId] = useState<number | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showChangelog, setShowChangelog] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [activeRest, setActiveRest] = useState<ActiveRest | null>(null);
   const [lastRestType, setLastRestType] = useState<24 | 45 | null>(null);
@@ -511,7 +676,7 @@ export default function ShiftTracker() {
     csvContent += `Report for ${t.months[currentMonth]} ${currentYear}\n`;
     csvContent += `Driver: ${driverName || "—"}\n\n`;
     csvContent += "SHIFTS\n";
-    csvContent += "Date,Start,End,Hours,Amount (zł),Note/Comment\n";
+    csvContent += `Date,Start,End,Hours,Amount (${currency}),Note/Comment\n`;
     
     currentMonthShifts.forEach(day => {
       const k = shiftKey(currentYear, currentMonth, day);
@@ -525,7 +690,7 @@ export default function ShiftTracker() {
     
     if (monthAdvances.length > 0) {
       csvContent += "\nADVANCES\n";
-      csvContent += "Amount (zł),Note/Comment\n";
+      csvContent += `Amount (${currency}),Note/Comment\n`;
       monthAdvances.forEach(adv => {
         const note = adv.note ? adv.note.replace(/"/g, '""') : "";
         csvContent += `${adv.amount},"${note}"\n`;
@@ -535,8 +700,8 @@ export default function ShiftTracker() {
     csvContent += "\nSUMMARY\n";
     csvContent += `Total Shifts,${currentMonthShifts.length}\n`;
     csvContent += `Total Hours,${totalHours}\n`;
-    csvContent += `Total Advances,${totalAdvances} zł\n`;
-    csvContent += `To Receive,${Math.round(toReceive)} zł\n`;
+    csvContent += `Total Advances,${totalAdvances} ${currency}\n`;
+    csvContent += `To Receive,${Math.round(toReceive)} ${currency}\n`;
     
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -694,7 +859,7 @@ export default function ShiftTracker() {
               hours = parseInt(hoursMatch[1]);
             }
 
-            const zlMatch = line.match(/(\d+)\s*(zł|zl)/);
+            const zlMatch = line.match(/(\d+)\s*(zł|zl|€|eur)/i);
             if (zlMatch) {
               manualAmount = parseInt(zlMatch[1]);
             }
@@ -709,7 +874,7 @@ export default function ShiftTracker() {
           }
         }
       } else {
-        const advMatch = line.match(/^(\d+)\s*(zł|zl)\s*(.*)$/i);
+        const advMatch = line.match(/^(\d+)\s*(zł|zl|€|eur)\s*(.*)$/i);
         if (advMatch) {
           const amount = parseInt(advMatch[1]);
           let note = advMatch[3]?.trim();
@@ -880,6 +1045,11 @@ export default function ShiftTracker() {
     localStorage.setItem("shift_tracker_preferred_lang", lang);
   }, [lang]);
 
+  // Save currency separately for ultimate persistence
+  useEffect(() => {
+    localStorage.setItem("shift_tracker_preferred_currency", currency);
+  }, [currency]);
+
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const didLongPress = useRef(false);
 
@@ -893,6 +1063,7 @@ export default function ShiftTracker() {
         if (parsed.advances) setAdvances(parsed.advances);
         if (parsed.driverName) setDriverName(parsed.driverName);
         if (parsed.lang) setLang(parsed.lang);
+        if (parsed.currency) setCurrency(parsed.currency);
         if (parsed.themeName) setThemeName(parsed.themeName);
         if (parsed.shiftRate) setShiftRate(parsed.shiftRate);
         if (parsed.profiles) setProfiles(parsed.profiles);
@@ -952,6 +1123,7 @@ export default function ShiftTracker() {
       advances, 
       driverName, 
       lang, 
+      currency,
       themeName, 
       shiftRate,
       profiles: updatedProfiles,
@@ -961,7 +1133,7 @@ export default function ShiftTracker() {
       lastSeenVersion: APP_VERSION // Always save current version
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  }, [shifts, advances, driverName, lang, themeName, shiftRate, showOnboarding, activeRest, lastRestType, activeProfileId]);
+  }, [shifts, advances, driverName, lang, currency, themeName, shiftRate, showOnboarding, activeRest, lastRestType, activeProfileId]);
 
   const shiftKey = (y: number, m: number, d: number) => `${y}-${m}-${d}`;
   const monthAdvKey = (y: number, m: number) => `${y}-${m}`;
@@ -1408,7 +1580,7 @@ export default function ShiftTracker() {
                 onBlur={() => { if (shiftRate === "" || shiftRate === 0) setShiftRate(380) }}
                 className={`w-20 bg-transparent border-b ${theme.border} focus:border-${theme.accent} focus:outline-none font-black text-3xl text-current transition-all`}
               />
-              <span className={`text-sm font-medium ${theme.textMuted}`}>zł / {t.perShift}</span>
+              <span className={`text-sm font-medium ${theme.textMuted}`}>{currency} / {t.perShift}</span>
               <span className="text-[9px] opacity-20 font-bold ml-2">v{APP_VERSION}</span>
             </div>
             <motion.div 
@@ -1417,7 +1589,7 @@ export default function ShiftTracker() {
               transition={{ delay: 0.2 }}
               className="text-[11px] mt-1 opacity-60"
             >
-              ≈ {hourRate.toFixed(2)} zł / {t.perHour}
+              ≈ {hourRate.toFixed(2)} {currency} / {t.perHour}
             </motion.div>
           </div>
 
@@ -1538,6 +1710,15 @@ export default function ShiftTracker() {
               title={lang === "ua" ? "Zmiana języka na Polski" : "Зміна мови на Українську"}
             >
               <Globe size={14} className="opacity-80" />
+            </button>
+
+            {/* Currency Selector */}
+            <button
+              onClick={() => handleCurrencyChange(currency === "zł" ? "€" : "zł")}
+              className={`w-9 sm:w-10 h-9 sm:h-10 flex items-center justify-center ${theme.accentMuted} border ${theme.border} rounded-xl text-xs font-black ${theme.accentText} transition-all duration-300 hover:scale-[1.05] active:scale-95`}
+              title={lang === "ua" ? "Конвертувати та змінити валюту за курсом 1 € = 4.30 zł" : "Konwertuj i zmień walutę po kursie 1 € = 4.30 zł"}
+            >
+              <span className="text-xs font-black select-none tracking-tighter leading-none">{currency}</span>
             </button>
           </div>
         </header>
@@ -1661,7 +1842,7 @@ export default function ShiftTracker() {
                         {shift.hours}H
                       </span>
                       {shift.manualAmount !== undefined && (
-                        <span className="text-[5px] sm:text-[6px] font-black text-amber-300 uppercase leading-none mt-0.5">zł!</span>
+                        <span className="text-[5px] sm:text-[6px] font-black text-amber-300 uppercase leading-none mt-0.5">{currency}!</span>
                       )}
                     </div>
                   )}
@@ -1694,7 +1875,7 @@ export default function ShiftTracker() {
             {[
               { label: t.shifts, value: currentMonthShifts.length, icon: CheckCircle2, color: theme.accentText },
               { label: t.hours, value: totalHours, icon: Clock, color: "text-current opacity-70" },
-              { label: t.earned, value: `${Math.round(monthTotalEarned)} zł`, icon: Wallet, color: "text-current font-black" }
+              { label: t.earned, value: `${Math.round(monthTotalEarned)} ${currency}`, icon: Wallet, color: "text-current font-black" }
             ].map((item) => (
               <div key={item.label} className={`${themeName === 'light' ? 'bg-slate-100' : 'bg-white/5'} border ${theme.border} rounded-2xl p-3 text-center transition-colors`}>
                 <div className={`text-lg font-black mb-1 ${item.color}`}>{item.value}</div>
@@ -1708,18 +1889,18 @@ export default function ShiftTracker() {
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <span className={`text-[10px] font-bold ${theme.textMuted} uppercase`}>{t.totalEarned}</span>
-                <span className="text-sm font-bold">{Math.round(monthTotalEarned)} zł</span>
+                <span className="text-sm font-bold">{Math.round(monthTotalEarned)} {currency}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className={`text-[10px] font-bold ${theme.textMuted} uppercase`}>{t.totalAdvances}</span>
-                <span className="text-sm font-bold text-red-500">−{Math.round(totalAdvances)} zł</span>
+                <span className="text-sm font-bold text-red-500">−{Math.round(totalAdvances)} {currency}</span>
               </div>
               <div className={`h-px ${themeName === 'light' ? 'bg-slate-200' : 'bg-white/10'} my-1`} />
               <div className="flex items-center justify-between">
                 <span className={`text-[11px] font-black ${theme.accentText} uppercase tracking-wide`}>{t.balance}</span>
                 <div className="text-right">
                   <div className={`text-xl font-black ${toReceive >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {Math.round(toReceive)} zł
+                    {Math.round(toReceive)} {currency}
                   </div>
                   <div className={`text-[9px] ${theme.textMuted} uppercase font-bold`}>{t.toReceive}</div>
                 </div>
@@ -1764,7 +1945,7 @@ export default function ShiftTracker() {
           </div>
           {totalAdvances > 0 && (
             <div className={`px-3 py-1 ${theme.secondaryBg} border border-current/20 rounded-lg text-sm font-black`}>
-              {Math.round(totalAdvances)} zł
+              {Math.round(totalAdvances)} {currency}
             </div>
           )}
         </motion.button>
@@ -1834,7 +2015,7 @@ export default function ShiftTracker() {
                             className={`relative z-10 flex items-center justify-between ${themeName === 'light' ? 'bg-white' : 'bg-[#1a1a2e]'} border ${theme.border} rounded-2xl p-4 cursor-grab active:cursor-grabbing transition-colors duration-300`}
                           >
                             <div className="flex-1 cursor-pointer">
-                              <div className={`text-lg font-black text-${theme.secondary}`}>{adv.amount} zł</div>
+                              <div className={`text-lg font-black text-${theme.secondary}`}>{adv.amount} {currency}</div>
                               {adv.note && <div className={`text-[10px] ${theme.textMuted} font-medium uppercase truncate mt-0.5`}>{adv.note}</div>}
                             </div>
                             
@@ -1873,6 +2054,13 @@ export default function ShiftTracker() {
             className={`text-[9px] font-bold tracking-[0.2em] uppercase opacity-30 hover:opacity-100 transition-opacity flex flex-col items-center gap-2 mx-auto`}
           >
             <span>{t.appTitle} · {t.version} {APP_VERSION}</span>
+          </button>
+
+          <button 
+            onClick={() => setShowChangelog(true)}
+            className="mt-2 text-[9px] font-bold tracking-[0.1em] uppercase text-purple-400 hover:text-purple-300 opacity-60 hover:opacity-100 transition-all flex items-center gap-1 mx-auto"
+          >
+            <span className="border-b border-purple-500/25 pb-0.5">{t.changelog}</span>
           </button>
 
           <button 
@@ -1977,8 +2165,8 @@ export default function ShiftTracker() {
                   <div className="text-xl font-black text-current">
                     {modalEnd > modalStart ? modalEnd - modalStart : 0}h → {
                       modalManualAmount && !isNaN(parseFloat(modalManualAmount)) 
-                      ? `${modalManualAmount} zł` 
-                      : `${Math.round((modalEnd > modalStart ? modalEnd - modalStart : 0) * hourRate)} zł`
+                      ? `${modalManualAmount} ${currency}` 
+                      : `${Math.round((modalEnd > modalStart ? modalEnd - modalStart : 0) * hourRate)} ${currency}`
                     }
                   </div>
                 </div>
@@ -2145,7 +2333,7 @@ export default function ShiftTracker() {
                           <div className={`text-[9px] font-bold ${theme.textMuted} tracking-widest uppercase`}>{item.year}</div>
                         </div>
                         <div className={`text-lg font-black ${item.earned - item.advances >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                          {Math.round(item.earned - item.advances)} zł
+                          {Math.round(item.earned - item.advances)} {currency}
                         </div>
                       </div>
 
@@ -2214,6 +2402,73 @@ export default function ShiftTracker() {
               >
                 {t.gotIt}
               </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* CHANGELOG MODAL */}
+      <AnimatePresence>
+        {showChangelog && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowChangelog(false)}
+              className="absolute inset-0 bg-black/90 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className={`relative w-full max-w-md ${themeName === 'light' ? 'bg-white' : 'bg-[#1a1a2e]'} border ${theme.border} rounded-[40px] overflow-hidden shadow-2xl flex flex-col max-h-[80vh] p-8`}
+            >
+              <div className="flex items-center justify-between mb-6 border-b border-white/5 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 ${theme.accentMuted} rounded-2xl flex items-center justify-center`}>
+                    <Info size={20} className={theme.accentText} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black">{t.changelogTitle}</h2>
+                    <div className={`text-[9px] ${theme.textMuted} font-black uppercase tracking-wider`}>v{APP_VERSION}</div>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowChangelog(false)} 
+                  className={`p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/5 ${theme.textMuted} hover:text-current transition-colors`}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto pr-1 space-y-6 scrollbar-thin">
+                {CHANGELOG_DATA[lang === "ua" ? "ua" : "pl"].map((ver, idx) => (
+                  <div key={ver.version} className="border-b border-white/5 last:border-0 pb-6 last:pb-0">
+                    <div className="flex items-baseline justify-between mb-3">
+                      <span className="text-base font-black text-current">{ver.version}</span>
+                      <span className={`text-[10px] ${theme.textMuted} font-bold`}>{ver.date}</span>
+                    </div>
+                    <ul className="space-y-2">
+                      {ver.changes.map((change, i) => (
+                        <li key={i} className="flex gap-2.5 items-start">
+                          <span className={`w-1.5 h-1.5 rounded-full mt-1.5 bg-${theme.accent} shrink-0`} />
+                          <p className={`text-xs opacity-80 leading-relaxed font-medium`}>{change}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-white/5">
+                <button
+                  onClick={() => setShowChangelog(false)}
+                  className={`w-full py-4 bg-${theme.accent} hover:opacity-90 rounded-[24px] text-white font-black uppercase tracking-widest transition-all shadow-xl shadow-purple-500/10 text-xs`}
+                >
+                  {t.gotIt}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
@@ -2395,7 +2650,7 @@ export default function ShiftTracker() {
                               <span className={`px-2 py-0.5 rounded-full text-[7px] font-black uppercase ${theme.indicator} text-white`}>Active</span>
                             )}
                           </div>
-                          <div className={`text-[10px] font-bold ${theme.textMuted} uppercase tracking-wider`}>{p.rate} zł / {t.perShift}</div>
+                          <div className={`text-[10px] font-bold ${theme.textMuted} uppercase tracking-wider`}>{p.rate} {currency} / {t.perShift}</div>
                         </div>
                         <button 
                           onClick={() => deleteProfileById(p.id)}
@@ -2451,11 +2706,11 @@ export default function ShiftTracker() {
             </div>
             <div className="p-4 bg-slate-50 rounded-xl">
               <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">{t.totalAdvances}</span>
-              <span className="text-xl font-extrabold text-red-500 flex items-center">-{totalAdvances} zł</span>
+              <span className="text-xl font-extrabold text-red-500 flex items-center">-{totalAdvances} {currency}</span>
             </div>
             <div className="p-4 bg-slate-50 rounded-xl">
               <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider block mb-1">{t.toReceive}</span>
-              <span className="text-xl font-extrabold text-green-600 font-mono">{Math.round(toReceive)} zł</span>
+              <span className="text-xl font-extrabold text-green-600 font-mono">{Math.round(toReceive)} {currency}</span>
             </div>
           </div>
 
@@ -2486,7 +2741,7 @@ export default function ShiftTracker() {
                             {sh?.note && <span className="block text-[9px] text-slate-500 font-medium italic mt-0.5 leading-tight">{sh.note}</span>}
                           </td>
                           <td className="py-2 text-center font-semibold">{sh?.hours || 0} {t.perHour}</td>
-                          <td className="py-2 text-right font-black text-slate-900">{Math.round(displayEarned)} zł</td>
+                          <td className="py-2 text-right font-black text-slate-900">{Math.round(displayEarned)} {currency}</td>
                         </tr>
                       );
                     })}
@@ -2511,7 +2766,7 @@ export default function ShiftTracker() {
                   <tbody>
                     {monthAdvances.map(adv => (
                       <tr key={adv.id} className="border-b border-slate-100">
-                        <td className="py-2 font-black text-red-600">{adv.amount} zł</td>
+                        <td className="py-2 font-black text-red-600">{adv.amount} {currency}</td>
                         <td className="py-2 text-right font-medium text-slate-600 max-w-[160px] truncate">
                           {adv.note || "—"}
                         </td>
